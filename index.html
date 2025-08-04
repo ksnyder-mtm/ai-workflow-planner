@@ -1871,17 +1871,53 @@
                         }).join('')}
                     </ul>
                     
-                    <h4 style="color: #1ab1d2; margin-top: 20px;">🤖 AI Enhancement Solutions (${totalSolutions}):</h4>
                     ${painPoints.map((point, index) => {
                         if (!solutions[index] || solutions[index].length === 0) return '';
-                        return `
-                            <div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                                <strong>For "${point.text}":</strong>
-                                <ul style="margin-left: 20px; margin-top: 8px;">
-                                    ${solutions[index].map(solution => `<li>${solution}</li>`).join('')}
-                                </ul>
-                            </div>
-                        `;
+                        
+                        // Separate superpowers from user plans
+                        let superpowers = [];
+                        let userPlans = [];
+                        
+                        solutions[index].forEach(solution => {
+                            if (typeof solution === 'string') {
+                                // Check if it's an AI superpower
+                                if (solution.match(/^[📝✍️📊🗂️🌐💡]\s*(Summarizing|Drafting|Analyzing|Organizing|Translating|Brainstorming):/)) {
+                                    superpowers.push(solution);
+                                } else {
+                                    userPlans.push(solution);
+                                }
+                            } else if (solution && solution.text) {
+                                userPlans.push(solution.text);
+                            } else if (solution && solution.description) {
+                                userPlans.push(solution.description);
+                            } else {
+                                userPlans.push(solution);
+                            }
+                        });
+                        
+                        let html = `<div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                      <strong style="color: #1c487b;">For "${point.text}":</strong>`;
+                        
+                        if (superpowers.length > 0) {
+                            html += '<h5 style="color: #ff9800; margin-top: 15px; margin-bottom: 8px;">🤖 AI Superpowers:</h5>';
+                            html += '<ul style="margin-left: 20px;">';
+                            superpowers.forEach(power => {
+                                html += `<li style="background: #fff3e0; padding: 8px; margin: 5px 0; border-radius: 4px; border-left: 3px solid #ff9800;">${power}</li>`;
+                            });
+                            html += '</ul>';
+                        }
+                        
+                        if (userPlans.length > 0) {
+                            html += '<h5 style="color: #1ab1d2; margin-top: 15px; margin-bottom: 8px;">💭 Your Specific Implementation Plan:</h5>';
+                            html += '<ul style="margin-left: 20px;">';
+                            userPlans.forEach(plan => {
+                                html += `<li style="background: #e8f6f8; padding: 8px; margin: 5px 0; border-radius: 4px; border-left: 3px solid #1ab1d2; font-style: italic;">${plan}</li>`;
+                            });
+                            html += '</ul>';
+                        }
+                        
+                        html += '</div>';
+                        return html;
                     }).join('')}
                     
                     <div style="margin-top: 20px; padding: 15px; background: #e8f6f8; border-radius: 8px;">
