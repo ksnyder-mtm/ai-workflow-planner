@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Workflow Detective - COMPAS Edition</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fef4e3;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .compas-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .compas-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .compas-step.active {
+            background: #1ab1d2;
+            color: white;
+        }
+
+        .compas-step.completed {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .gamification-bar {
+            background: #1c487b;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .points-display {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .points-value {
+            background: #f18f38;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .badges-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: relative;
+            cursor: help;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .badge.earned {
+            opacity: 1;
+            animation: badgeEarned 0.5s ease;
+            background: #f18f38;
+        }
+
+        @keyframes badgeEarned {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .badge:hover .tooltip {
+            opacity: 1;
+        }
+
+        .header {
+            background: #1c487b;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '🔍';
+            font-size: 3rem;
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        .logo-container {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .progress-section {
+            background: #f0f0f0;
+            padding: 20px 30px;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: #ddd;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #1ab1d2, #f18f38);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.3);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .game-area {
+            padding: 30px;
+        }
+
+        .level {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .level.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .level-header {
+            background: #fef4e3;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #1c487b;
+            position: relative;
+        }
+
+        .level-title {
+            font-size: 1.8rem;
+            color: #1c487b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .level-description {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #1ab1d2;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .help-button:hover {
+            transform: scale(1.1);
+            background: #f18f38;
+        }
+
+        .workflow-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .workflow-card {
+            background: #fef4e3;
+            border: 2px solid #f18f38;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(26,177,210,0.1) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.5s ease;
+        }
+
+        .workflow-card:hover::before {
+            transform: scale(1);
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-color: #1ab1d2;
+        }
+
+        .workflow-card.selected {
+            background: #1ab1d2;
+            color: white;
+            border-color: #1c487b;
+            transform: scale(1.02);
+        }
+
+        .workflow-card.selected .card-points {
+            background: white;
+            color: #1ab1d2;
+        }
+
+        .workflow-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-points {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #1ab1d2;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .pain-points-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px dashed #1ab1d2;
+            position: relative;
+        }
+
+        .pain-point-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .pain-point-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .pain-point-input input:focus {
+            outline: none;
+            border-color: #1ab1d2;
+        }
+
+        .add-pain-btn {
+            background: #f18f38;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .add-pain-btn:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .add-pain-btn:active {
+            transform: translateY(0);
+        }
+
+        .pain-point-list {
+            margin-top: 15px;
+        }
+
+        .pain-point-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #1c487b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        .pain-point-item.removing {
+            animation: slideOut 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideOut {
+            to { opacity: 0; transform: translateX(20px); }
+        }
+
+        .pain-severity {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .severity-btn {
+            width: 25px;
+            height: 25px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .severity-btn.low { background: #2ecc71; }
+        .severity-btn.medium { background: #f39c12; }
+        .severity-btn.high { background: #e74c3c; }
+
+        .severity-btn.selected {
+            transform: scale(1.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .ai-capabilities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .ai-capability {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: move;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .ai-capability:hover {
+            border-color: #1ab1d2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .ai-capability.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .ai-capability h4 {
+            color: #1c487b;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .ai-capability p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .solution-builder {
+            background: #e8f6f8;
+            border: 2px dashed #1ab1d2;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 150px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .solution-builder.drag-over {
+            background: #d1f2f7;
+            border-color: #1c487b;
+        }
+
+        .solution-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #f18f38;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hint-box {
+            background: #e8f6f8;
+            border: 2px solid #1ab1d2;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .hint-box::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            padding: 0 5px;
+            font-size: 1.5rem;
+        }
+
+        .hint-box h4 {
+            color: #1c487b;
+            margin-bottom: 8px;
+        }
+
+        .examples {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .example-item {
+            margin: 5px 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .example-item:hover {
+            color: #1ab1d2;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 20px 0;
+        }
+
+        .nav-btn {
+            background: #1c487b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .nav-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #1ab1d2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .celebration {
+            text-align: center;
+            padding: 20px;
+            background: #fef4e3;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .celebration::before {
+            content: '🎉';
+            position: absolute;
+            font-size: 5rem;
+            opacity: 0.1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .celebration h2 {
+            color: #1c487b;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .final-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .final-badge {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f18f38;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            animation: bounceIn 0.5s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .results-section {
+            background: #e8f6f8;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .workflow-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #1ab1d2;
+        }
+
+        .download-btn {
+            background: #f18f38;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .notification.achievement {
+            background: #f39c12;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header::before {
+                display: none;
+            }
+            
+            .logo-container {
+                width: 50px;
+                height: 50px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .workflow-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .compas-indicator {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-compas {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="compas-indicator">
+            <h4 style="color: #1c487b; margin-bottom: 10px; font-size: 1.1rem;">COMPAS Progress</h4>
+            <div class="compas-step" id="compas-context">
+                <span>🧭</span> Context
+            </div>
+            <div class="compas-step" id="compas-objective">
+                <span>🎯</span> Objective
+            </div>
+            <div class="compas-step" id="compas-method">
+                <span>📋</span> Method
+            </div>
+        </div>
+
+        <div class="gamification-bar">
+            <div class="points-display">
+                <span>Detective Points:</span>
+                <span class="points-value" id="pointsDisplay">0</span>
+            </div>
+            <div class="badges-container">
+                <div class="badge" id="badge-workflow">
+                    🎯
+                    <span class="tooltip">Workflow Identifier</span>
+                </div>
+                <div class="badge" id="badge-pain">
+                    🔍
+                    <span class="tooltip">Pain Point Detective</span>
+                </div>
+                <div class="badge" id="badge-solution">
+                    💡
+                    <span class="tooltip">Solution Architect</span>
+                </div>
+                <div class="badge" id="badge-complete">
+                    🏆
+                    <span class="tooltip">Mission Complete!</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header">
+            <h1>🕵️ AI Workflow Detective</h1>
+            <p>Discover hidden opportunities to enhance your nonprofit's impact with AI</p>
+            <div class="logo-container">
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Background shapes -->
+                    <circle cx="30" cy="30" r="25" fill="#f7d794" opacity="0.8"/>
+                    <path d="M 20 20 Q 50 10, 80 20 Q 90 50, 80 80 Q 50 90, 20 80 Q 10 50, 20 20" fill="#7dd3d3" opacity="0.8"/>
+                    
+                    <!-- Shield with heart -->
+                    <g transform="translate(50, 50)">
+                        <!-- Shield -->
+                        <path d="M -15 -20 L 15 -20 L 15 5 L 0 20 L -15 5 Z" 
+                              fill="#1ab1d2" 
+                              stroke="#1c487b" 
+                              stroke-width="3"/>
+                        
+                        <!-- Heart -->
+                        <path d="M -8 -5 C -8 -10, -12 -12, -15 -10 C -18 -8, -18 -4, -15 0 L 0 10 L 15 0 C 18 -4, 18 -8, 15 -10 C 12 -12, 8 -10, 8 -5 C 8 -3, 5 0, 0 5 C -5 0, -8 -3, -8 -5 Z" 
+                              fill="#fef4e3" 
+                              stroke="#1c487b" 
+                              stroke-width="2"/>
+                    </g>
+                    
+                    <!-- Hand -->
+                    <g transform="translate(50, 65)">
+                        <path d="M -20 0 C -20 -5, -15 -10, -10 -10 L 10 -10 C 15 -10, 20 -5, 20 0 L 20 10 C 20 15, 15 20, 10 20 L -10 20 C -15 20, -20 15, -20 10 Z" 
+                              fill="#fef4e3" 
+                              stroke="#1c487b" 
+                              stroke-width="3"/>
+                        <!-- Fingers hint -->
+                        <line x1="-10" y1="-10" x2="-10" y2="-5" stroke="#1c487b" stroke-width="2"/>
+                        <line x1="0" y1="-10" x2="0" y2="-5" stroke="#1c487b" stroke-width="2"/>
+                        <line x1="10" y1="-10" x2="10" y2="-5" stroke="#1c487b" stroke-width="2"/>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Ready to begin your detective journey!</div>
+        </div>
+
+        <div class="game-area">
+            <!-- Overview Level -->
+            <div class="level active" id="overview">
+                <div class="level-header">
+                    <div class="level-title">
+                        🗺️ Your AI Enhancement Journey
+                    </div>
+                    <div class="level-description">
+                        Welcome, AI Detective! You're about to discover how AI can make your nonprofit work more impactful - not by replacing what you do, but by handling the tedious stuff so you can focus on what matters most.
+                    </div>
+                    <button class="help-button" onclick="showHelp('overview')">?</button>
+                </div>
+
+                <div class="mobile-compas" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="color: #1c487b; margin-bottom: 10px;">You'll explore the COMPAS framework:</h4>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <span style="background: #1ab1d2; color: white; padding: 5px 10px; border-radius: 5px;">🧭 Context</span>
+                        <span style="background: #f18f38; color: white; padding: 5px 10px; border-radius: 5px;">🎯 Objective</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div style="background: #fef4e3; padding: 25px; border-radius: 15px; border-left: 5px solid #f18f38;">
+                        <h3 style="color: #1c487b; margin-bottom: 15px;">🎮 How to Play</h3>
+                        <p style="line-height: 1.6;">Earn points and badges as you identify workflows, discover pain points, and design AI solutions. Each choice you make builds your personalized AI enhancement plan!</p>
+                    </div>
+                    
+                    <div style="background: #e8f6f8; padding: 25px; border-radius: 15px; border-left: 5px solid #1ab1d2;">
+                        <h3 style="color: #1c487b; margin-bottom: 15px;">⏱️ Time Investment</h3>
+                        <p style="line-height: 1.6;">About 10-15 minutes to complete. You'll walk away with a concrete plan you can actually use - no fluff, just practical next steps.</p>
+                    </div>
+                    
+                    <div style="background: #f0f8ff; padding: 25px; border-radius: 15px; border-left: 5px solid #1c487b;">
+                        <h3 style="color: #1c487b; margin-bottom: 15px;">🤝 Remember This</h3>
+                        <p style="line-height: 1.6;">AI augmentation = AI does the boring stuff, you do the brilliant stuff. It's about partnership, not replacement!</p>
+                    </div>
+                </div>
+
+                <div style="background: #fef4e3; padding: 25px; border-radius: 15px; border: 2px solid #1ab1d2; margin-bottom: 25px;">
+                    <h3 style="color: #1c487b; margin-bottom: 15px;">🎯 Your Mission (Should You Choose to Accept It)</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="text-align: center; padding: 15px;">
+                            <div style="background: #f18f38; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.5rem; font-weight: bold;">1</div>
+                            <h4 style="color: #1c487b;">Context</h4>
+                            <p style="font-size: 0.9rem; color: #666;">Choose a workflow that needs help</p>
+                            <p style="font-size: 0.8rem; color: #f18f38; margin-top: 5px;">+10 points</p>
+                        </div>
+                        <div style="text-align: center; padding: 15px;">
+                            <div style="background: #1ab1d2; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.5rem; font-weight: bold;">2</div>
+                            <h4 style="color: #1c487b;">Find Clues</h4>
+                            <p style="font-size: 0.9rem; color: #666;">Identify what's slowing you down</p>
+                            <p style="font-size: 0.8rem; color: #1ab1d2; margin-top: 5px;">+5 points each</p>
+                        </div>
+                        <div style="text-align: center; padding: 15px;">
+                            <div style="background: #1c487b; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.5rem; font-weight: bold;">3</div>
+                            <h4 style="color: #1c487b;">Objective</h4>
+                            <p style="font-size: 0.9rem; color: #666;">Design AI-powered solutions</p>
+                            <p style="font-size: 0.8rem; color: #1c487b; margin-top: 5px;">+10 points each</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hint-box">
+                    <h4>💡 Pro Tip</h4>
+                    <p>Think of a task you did this week that made you think "there has to be a better way!" That's your perfect starting point.</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="nav-btn" onclick="startDetectiveWork()" style="background: #f18f38; font-size: 1.3rem; padding: 20px 40px;">
+                        🕵️ Start Your Detective Work!
+                    </button>
+                </div>
+            </div>
+
+            <!-- Level 1: Choose Workflow (Context) -->
+            <div class="level" id="level1">
+                <div class="level-header">
+                    <div class="level-title">
+                        🧭 Mission 1: Context - Choose Your Workflow Challenge
+                    </div>
+                    <div class="level-description">
+                        Every nonprofit has workflows that eat up precious time. Which one frustrates you the most? Select one below or create your own.
+                    </div>
+                    <button class="help-button" onclick="showHelp('workflow')">?</button>
+                </div>
+
+                <div class="hint-box">
+                    <h4>💭 Need inspiration? Click any example below:</h4>
+                    <div class="examples">
+                        <div class="example-item" onclick="selectExample('meetings')">• "Our weekly team meetings feel like Groundhog Day"</div>
+                        <div class="example-item" onclick="selectExample('communication')">• "I write the same donor thank-you email 50 times a month"</div>
+                        <div class="example-item" onclick="selectExample('data')">• "Survey responses sit in a spreadsheet graveyard"</div>
+                    </div>
+                </div>
+
+                <div class="workflow-cards" id="workflowCards">
+                    <div class="workflow-card" data-workflow="meetings" onclick="selectWorkflow('meetings', this)">
+                        <span class="card-points">+10</span>
+                        <h3>📋 Meeting Management</h3>
+                        <p>Planning, running, and following up on meetings</p>
+                    </div>
+                    <div class="workflow-card" data-workflow="communication" onclick="selectWorkflow('communication', this)">
+                        <span class="card-points">+10</span>
+                        <h3>📧 Communication & Outreach</h3>
+                        <p>Emails, newsletters, social media, donor communications</p>
+                    </div>
+                    <div class="workflow-card" data-workflow="data" onclick="selectWorkflow('data', this)">
+                        <span class="card-points">+10</span>
+                        <h3>📊 Data Collection & Analysis</h3>
+                        <p>Surveys, reports, program evaluation, grant reporting</p>
+                    </div>
+                    <div class="workflow-card" data-workflow="admin" onclick="selectWorkflow('admin', this)">
+                        <span class="card-points">+10</span>
+                        <h3>📁 Administrative Tasks</h3>
+                        <p>Scheduling, file organization, volunteer coordination</p>
+                    </div>
+                    <div class="workflow-card" data-workflow="fundraising" onclick="selectWorkflow('fundraising', this)">
+                        <span class="card-points">+10</span>
+                        <h3>💝 Fundraising & Grants</h3>
+                        <p>Grant writing, donor research, event planning</p>
+                    </div>
+                    <div class="workflow-card" data-workflow="custom" onclick="selectWorkflow('custom', this)">
+                        <span class="card-points">+15</span>
+                        <h3>✨ Something Else</h3>
+                        <p>Create your own workflow to analyze</p>
+                    </div>
+                </div>
+
+                <div id="customWorkflowSection" style="display: none;">
+                    <div class="hint-box">
+                        <h4>Describe Your Custom Workflow:</h4>
+                        <input type="text" id="customWorkflowInput" placeholder="e.g., Client intake process, Volunteer training, Program delivery..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-top: 10px;">
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">Bonus points for being specific! 🎯</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 2: Identify Pain Points -->
+            <div class="level" id="level2">
+                <div class="level-header">
+                    <div class="level-title">
+                        🔍 Mission 2: Detective Work - Find the Pain Points
+                    </div>
+                    <div class="level-description">
+                        <span id="workflowContext"></span> Now let's dig deeper. What specifically makes this workflow a time thief? List all your pain points, then select the one you want to tackle first.
+                    </div>
+                    <button class="help-button" onclick="showHelp('pain')">?</button>
+                </div>
+
+                <div class="hint-box">
+                    <h4>🕵️ Detective Clues to Look For:</h4>
+                    <p>Tasks that are: repetitive • time-consuming • error-prone • involve manual copying • require waiting • feel unnecessarily complex</p>
+                    <div class="examples" id="painExamples"></div>
+                </div>
+
+                <div class="pain-points-section">
+                    <h3 style="color: #1c487b; margin-bottom: 15px;">🎯 What specific tasks waste your time?</h3>
+                    <div class="pain-point-input">
+                        <input type="text" id="painPointInput" placeholder="Describe a specific pain point or time waster...">
+                        <button class="add-pain-btn" onclick="addPainPoint()">➕ Add</button>
+                    </div>
+                    <div style="margin-bottom: 15px; color: #666; font-size: 0.9rem;">
+                        Each pain point = <span style="color: #f18f38; font-weight: bold;">+5 points</span> | 
+                        Select one to focus on = <span style="color: #1ab1d2; font-weight: bold;">+10 bonus points</span>
+                    </div>
+                    <div class="pain-point-list" id="painPointList"></div>
+                    
+                    <div id="selectedPainPointSection" style="display: none; margin-top: 20px; padding: 20px; background: #e8f6f8; border-radius: 10px; border: 2px solid #1ab1d2;">
+                        <h4 style="color: #1c487b; margin-bottom: 10px;">✅ Selected Pain Point to Solve:</h4>
+                        <p id="selectedPainPointText" style="font-size: 1.1rem; font-weight: bold;"></p>
+                        <button class="nav-btn" onclick="changeSelectedPainPoint()" style="margin-top: 10px; padding: 10px 20px; font-size: 1rem;">
+                            🔄 Change Selection
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Level 3: AI Solutions (Objective) -->
+            <div class="level" id="level3">
+                <div class="level-header">
+                    <div class="level-title">
+                        🎯 Mission 3: Objective - Design Your AI Solutions
+                    </div>
+                    <div class="level-description">
+                        Time to transform pain into progress! Focus on solving your selected pain point with AI assistance. Remember: AI handles the repetitive stuff, you handle the human stuff.
+                    </div>
+                    <button class="help-button" onclick="showHelp('solution')">?</button>
+                </div>
+
+                <div id="focusedPainPoint" style="margin-bottom: 20px; padding: 20px; background: #fef4e3; border-radius: 15px; border-left: 5px solid #f18f38;">
+                    <h3 style="color: #1c487b; margin-bottom: 10px;">🎯 Solving This Pain Point:</h3>
+                    <p id="focusedPainText" style="font-size: 1.2rem; font-weight: bold; color: #1c487b;"></p>
+                    <p style="margin-top: 10px; color: #666;">Now let's brainstorm AI solutions to tackle this specific challenge!</p>
+                </div>
+
+                <div class="hint-box">
+                    <h4>🤖 AI Superpowers at Your Disposal:</h4>
+                    <div class="ai-capabilities">
+                        <div class="ai-capability" draggable="true" data-capability="summarize">
+                            <h4>📝 Summarizing</h4>
+                            <p>Condense long documents, meeting notes, or emails</p>
+                        </div>
+                        <div class="ai-capability" draggable="true" data-capability="draft">
+                            <h4>✍️ Drafting</h4>
+                            <p>Create first drafts of emails, reports, or proposals</p>
+                        </div>
+                        <div class="ai-capability" draggable="true" data-capability="analyze">
+                            <h4>📊 Analyzing</h4>
+                            <p>Find patterns in data, feedback, or survey responses</p>
+                        </div>
+                        <div class="ai-capability" draggable="true" data-capability="organize">
+                            <h4>🗂️ Organizing</h4>
+                            <p>Categorize information, create structure from chaos</p>
+                        </div>
+                        <div class="ai-capability" draggable="true" data-capability="translate">
+                            <h4>🌐 Translating</h4>
+                            <p>Convert content between languages or simplify jargon</p>
+                        </div>
+                        <div class="ai-capability" draggable="true" data-capability="brainstorm">
+                            <h4>💡 Brainstorming</h4>
+                            <p>Generate ideas, solutions, or creative approaches</p>
+                        </div>
+                    </div>
+                    <p style="margin-top: 15px; text-align: center; color: #666;">Drag AI capabilities above or type your own solutions below!</p>
+                </div>
+
+                <div id="solutionsContainer"></div>
+                
+                <div id="additionalPainPoints" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                    <h4 style="color: #1c487b; margin-bottom: 15px;">🔄 Want to solve another pain point?</h4>
+                    <div id="remainingPainPoints"></div>
+                    <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">Each additional pain point solution earns bonus points!</p>
+                </div>
+            </div>
+
+            <!-- Results Level -->
+            <div class="level" id="results">
+                <div class="celebration">
+                    <h2>🎉 Mission Complete!</h2>
+                    <p>You've successfully mapped your AI enhancement journey!</p>
+                </div>
+
+                <div class="final-badges">
+                    <div class="final-badge">🏆</div>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <h3 style="color: #1c487b;">Final Score: <span id="finalScore" style="color: #f18f38;">0</span> Points!</h3>
+                    <p id="scoreMessage" style="color: #666; margin-top: 10px;"></p>
+                </div>
+
+                <div class="results-section">
+                    <h3 style="color: #1c487b; margin-bottom: 20px;">📋 Your AI-Augmented Workflow Plan</h3>
+                    <div id="workflowSummary"></div>
+                    
+                    <div style="background: #fef4e3; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h4 style="color: #1c487b; margin-bottom: 10px;">🚀 Next Steps:</h4>
+                        <ol style="margin-left: 20px; line-height: 1.8;">
+                            <li>Pick your highest-severity pain point to tackle first</li>
+                            <li>Try one AI solution for a week and measure the time saved</li>
+                            <li>Share your plan with your team for feedback</li>
+                            <li>Celebrate small wins - every minute saved is a victory!</li>
+                        </ol>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="download-btn" onclick="generatePDF()">
+                            📄 Download Your Plan as PDF
+                        </button>
+                        <button class="reset-btn" onclick="resetGame()">🔄 Start Over</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation" id="navigation">
+                <button class="nav-btn" id="prevBtn" onclick="previousLevel()">
+                    ⬅️ Previous
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="nextLevel()">
+                    Next Step ➡️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let currentLevel = 0;
+        let selectedWorkflow = '';
+        let customWorkflow = '';
+        let painPoints = [];
+        let currentPainPointIndex = -1;
+        let solutions = {};
+        let totalPoints = 0;
+        let earnedBadges = [];
+
+        const workflowExamples = {
+            meetings: {
+                title: "Meeting Management",
+                examples: ["Taking notes while facilitating", "Remembering to follow up on action items", "Scheduling with multiple people", "Writing meeting agendas from scratch", "Tracking decisions across meetings"],
+                aiExamples: ["AI meeting transcription", "Automated action item extraction", "Smart scheduling assistants", "Meeting agenda templates", "Decision tracking database"]
+            },
+            communication: {
+                title: "Communication & Outreach", 
+                examples: ["Writing similar emails repeatedly", "Personalizing mass communications", "Managing social media content", "Translating materials", "Responding to common questions"],
+                aiExamples: ["Email template generation", "Mail merge with personalization", "Social media content calendar", "Auto-translation tools", "FAQ chatbot"]
+            },
+            data: {
+                title: "Data Collection & Analysis",
+                examples: ["Manually organizing survey responses", "Creating charts from spreadsheets", "Writing summary reports", "Finding patterns in feedback", "Cleaning messy data"],
+                aiExamples: ["Survey response summarization", "Automated chart generation", "Report draft creation", "Pattern recognition", "Data cleaning tools"]
+            },
+            admin: {
+                title: "Administrative Tasks",
+                examples: ["Coordinating volunteer schedules", "Organizing digital files", "Tracking program attendance", "Managing contact databases", "Creating routine documents"],
+                aiExamples: ["Volunteer scheduling system", "Smart file organization", "Attendance tracking app", "CRM integration", "Document templates"]
+            },
+            fundraising: {
+                title: "Fundraising & Grants",
+                examples: ["Researching potential donors", "Tracking grant deadlines", "Writing thank you letters", "Creating fundraising reports", "Finding relevant grants"],
+                aiExamples: ["Donor research tools", "Grant calendar automation", "Thank you letter generator", "Impact report builder", "Grant matching service"]
+            }
+        };
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show';
+            if (type === 'error') notification.classList.add('error');
+            if (type === 'achievement') notification.classList.add('achievement');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function updatePoints(points, reason) {
+            totalPoints += points;
+            document.getElementById('pointsDisplay').textContent = totalPoints;
+            
+            if (points > 0) {
+                showNotification(`+${points} points: ${reason}`, 'achievement');
+            }
+        }
+
+        function earnBadge(badgeId) {
+            const badge = document.getElementById(badgeId);
+            if (!badge.classList.contains('earned')) {
+                badge.classList.add('earned');
+                earnedBadges.push(badgeId);
+                showNotification('🏅 New badge earned!', 'achievement');
+                updatePoints(20, 'Badge earned!');
+            }
+        }
+
+        function updateCompasProgress() {
+            const contextStep = document.getElementById('compas-context');
+            const objectiveStep = document.getElementById('compas-objective');
+            const methodStep = document.getElementById('compas-method');
+            
+            if (currentLevel >= 1) contextStep.classList.add('active');
+            if (currentLevel >= 2) contextStep.classList.add('completed');
+            if (currentLevel >= 3) {
+                objectiveStep.classList.add('active');
+                if (solutions.length > 0 && solutions.some(arr => arr.length > 0)) {
+                    objectiveStep.classList.add('completed');
+                    methodStep.classList.add('active');
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progress = currentLevel / 3 * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            const progressTexts = [
+                "Ready to begin your detective journey!",
+                "Investigating workflows... 🔍",
+                "Uncovering pain points... 🕵️",
+                "Designing solutions... 💡",
+                "Mission accomplished! 🎉"
+            ];
+            
+            document.getElementById('progressText').textContent = progressTexts[currentLevel];
+            updateCompasProgress();
+        }
+
+        function showHelp(topic) {
+            const helpTexts = {
+                overview: "This activity uses the COMPAS framework to help you identify where AI can enhance your work. You'll explore Context (understanding your workflow), Objective (clarifying what needs improvement), and begin thinking about Method (how AI can help).",
+                workflow: "Choose a workflow that takes up significant time or causes frustration. The more specific you can be, the better your solutions will be. Custom workflows earn bonus points!",
+                pain: "Think about specific moments when you feel frustrated or think 'there must be a better way.' Rate severity based on how much time it wastes or how often it happens.",
+                solution: "AI excels at pattern recognition, content generation, and data processing. Humans excel at relationship building, creative problem solving, and ethical judgment. Design solutions that leverage both!"
+            };
+            
+            alert(helpTexts[topic] || "Help is on the way!");
+        }
+
+        function selectExample(workflow) {
+            const card = document.querySelector(`[data-workflow="${workflow}"]`);
+            if (card) {
+                selectWorkflow(workflow, card);
+                showNotification("Great choice! Example selected.", "success");
+            }
+        }
+
+        function startDetectiveWork() {
+            currentLevel = 1;
+            showLevel(currentLevel);
+            updateProgress();
+            updateNavigation();
+            showNotification("Let the detective work begin! 🕵️", "success");
+        }
+
+        function selectWorkflow(workflow, cardElement) {
+            document.querySelectorAll('.workflow-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            cardElement.classList.add('selected');
+            selectedWorkflow = workflow;
+
+            if (workflow === 'custom') {
+                document.getElementById('customWorkflowSection').style.display = 'block';
+                updatePoints(15, 'Custom workflow selected!');
+            } else {
+                document.getElementById('customWorkflowSection').style.display = 'none';
+                customWorkflow = '';
+                updatePoints(10, 'Workflow selected!');
+            }
+
+            earnBadge('badge-workflow');
+            updateNextButton();
+        }
+
+        function updateNextButton() {
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentLevel === 1) {
+                if (selectedWorkflow === 'custom') {
+                    const customInput = document.getElementById('customWorkflowInput').value.trim();
+                    nextBtn.disabled = !customInput;
+                } else {
+                    nextBtn.disabled = !selectedWorkflow;
+                }
+            } else if (currentLevel === 2) {
+                nextBtn.disabled = currentPainPointIndex < 0 || !painPoints[currentPainPointIndex];
+            } else if (currentLevel === 3) {
+                const currentSolutions = solutions[currentPainPointIndex] || [];
+                nextBtn.disabled = currentSolutions.length === 0;
+            }
+        }
+
+        function addPainPoint() {
+            const input = document.getElementById('painPointInput');
+            const painPoint = input.value.trim();
+            
+            if (painPoint) {
+                painPoints.push({
+                    text: painPoint,
+                    severity: 'medium'
+                });
+                input.value = '';
+                updatePainPointsList();
+                updateNextButton();
+                updatePoints(5, 'Pain point identified!');
+                
+                if (painPoints.length === 3) {
+                    earnBadge('badge-pain');
+                }
+            }
+        }
+
+        function updatePainPointsList() {
+            const list = document.getElementById('painPointList');
+            list.innerHTML = painPoints.map((point, index) => {
+                const isSelected = currentPainPointIndex === index;
+                return `
+                    <div class="pain-point-item ${isSelected ? 'selected' : ''}" id="pain-${index}" 
+                         style="${isSelected ? 'background: #e8f6f8; border-left-color: #1ab1d2;' : ''}">
+                        <span>${point.text}</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button class="nav-btn" onclick="selectPainPoint(${index})" 
+                                    style="padding: 5px 15px; font-size: 0.9rem; ${isSelected ? 'background: #2ecc71;' : 'background: #1ab1d2;'}">
+                                ${isSelected ? '✅ Selected' : '🎯 Select'}
+                            </button>
+                            <button class="remove-btn" onclick="removePainPoint(${index})">❌</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectPainPoint(index) {
+            currentPainPointIndex = index;
+            updatePainPointsList();
+            updateNextButton();
+            
+            // Show selected pain point section
+            const selectedSection = document.getElementById('selectedPainPointSection');
+            const selectedText = document.getElementById('selectedPainPointText');
+            selectedSection.style.display = 'block';
+            selectedText.textContent = painPoints[index].text;
+            
+            updatePoints(10, 'Pain point selected for focus!');
+            showNotification(`🎯 Focusing on: "${painPoints[index].text}"`, 'success');
+        }
+
+        function changeSelectedPainPoint() {
+            const selectedSection = document.getElementById('selectedPainPointSection');
+            selectedSection.style.display = 'none';
+            currentPainPointIndex = -1;
+            updatePainPointsList();
+            updateNextButton();
+        }
+
+        function removePainPoint(index) {
+            const item = document.getElementById(`pain-${index}`);
+            item.classList.add('removing');
+            setTimeout(() => {
+                painPoints.splice(index, 1);
+                // Adjust currentPainPointIndex if needed
+                if (currentPainPointIndex === index) {
+                    currentPainPointIndex = -1;
+                    document.getElementById('selectedPainPointSection').style.display = 'none';
+                } else if (currentPainPointIndex > index) {
+                    currentPainPointIndex--;
+                }
+                updatePainPointsList();
+                updateNextButton();
+            }, 300);
+        }
+
+        function setupSolutionsLevel() {
+            const container = document.getElementById('solutionsContainer');
+            const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
+            
+            document.getElementById('workflowContext').textContent = `Great work identifying pain points in your ${workflowTitle} workflow!`;
+            
+            // Set up pain examples
+            if (selectedWorkflow !== 'custom' && workflowExamples[selectedWorkflow]) {
+                const examples = workflowExamples[selectedWorkflow].examples;
+                document.getElementById('painExamples').innerHTML = `
+                    <div style="margin-top: 10px;">Examples for ${workflowTitle}:</div>
+                    ${examples.slice(0, 3).map(ex => `<div class="example-item">• ${ex}</div>`).join('')}
+                `;
+            }
+
+            // Display the focused pain point
+            const focusedPain = painPoints[currentPainPointIndex];
+            document.getElementById('focusedPainText').textContent = focusedPain.text;
+
+            // Create solution builder for the focused pain point
+            container.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #1ab1d2;">
+                    <div class="solution-builder" id="solutionBuilder${currentPainPointIndex}" 
+                         ondrop="handleDrop(event, ${currentPainPointIndex})" 
+                         ondragover="handleDragOver(event)"
+                         ondragleave="handleDragLeave(event)">
+                        <p style="text-align: center; color: #999; margin: 0;">
+                            💡 Drag AI capabilities here or type your own solution below
+                        </p>
+                        <div class="solutions-list" id="solutionsList${currentPainPointIndex}"></div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <textarea id="solution${currentPainPointIndex}" 
+                                  placeholder="Describe how AI could help solve this specific pain point..."
+                                  style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; min-height: 80px;"></textarea>
+                        <button class="add-pain-btn" onclick="addSolution(${currentPainPointIndex})" style="margin-top: 10px;">
+                            💡 Add Solution (+10 points)
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Initialize solutions object if not exists
+            if (!solutions[currentPainPointIndex]) {
+                solutions[currentPainPointIndex] = [];
+            }
+
+            // Update the solutions display
+            updateSolutionsList(currentPainPointIndex);
+
+            // Show remaining pain points for additional work
+            updateRemainingPainPoints();
+
+            // Set up drag and drop
+            setupDragAndDrop();
+        }
+
+        function setupDragAndDrop() {
+            const capabilities = document.querySelectorAll('.ai-capability');
+            
+            capabilities.forEach(cap => {
+                cap.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('capability', e.target.dataset.capability);
+                    e.dataTransfer.setData('text', e.target.querySelector('h4').textContent + ': ' + e.target.querySelector('p').textContent);
+                    e.target.classList.add('dragging');
+                });
+                
+                cap.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function updateRemainingPainPoints() {
+            const remainingContainer = document.getElementById('remainingPainPoints');
+            const remainingPainPoints = painPoints.filter((_, index) => index !== currentPainPointIndex);
+            
+            if (remainingPainPoints.length === 0) {
+                remainingContainer.innerHTML = '<p style="color: #666; font-style: italic;">All pain points addressed! 🎉</p>';
+                return;
+            }
+            
+            remainingContainer.innerHTML = remainingPainPoints.map((point, index) => {
+                const originalIndex = painPoints.findIndex(p => p === point);
+                const hasSolutions = solutions[originalIndex] && solutions[originalIndex].length > 0;
+                return `
+                    <div style="background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid ${hasSolutions ? '#2ecc71' : '#ddd'};">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <span>${point.text} ${hasSolutions ? '✅' : ''}</span>
+                            <button class="nav-btn" onclick="switchToPainPoint(${originalIndex})" 
+                                    style="padding: 5px 15px; font-size: 0.9rem; margin-left: 10px;">
+                                ${hasSolutions ? '🔄 Edit Solutions' : '💡 Add Solutions'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchToPainPoint(index) {
+            currentPainPointIndex = index;
+            setupSolutionsLevel();
+            showNotification(`🎯 Now focusing on: "${painPoints[index].text}"`, 'success');
+        }
+
+        function handleDrop(e, painPointIndex) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const text = e.dataTransfer.getData('text');
+            if (text && !solutions[painPointIndex].includes(text)) {
+                solutions[painPointIndex].push(text);
+                updateSolutionsList(painPointIndex);
+                updateNextButton();
+                updatePoints(10, 'AI solution added!');
+                updateRemainingPainPoints();
+                
+                const totalSolutions = Object.values(solutions).flat().length;
+                if (totalSolutions === 3) {
+                    earnBadge('badge-solution');
+                }
+            }
+        }
+
+        function addSolution(painPointIndex) {
+            const textarea = document.getElementById(`solution${painPointIndex}`);
+            const solution = textarea.value.trim();
+            
+            if (solution) {
+                if (!solutions[painPointIndex]) {
+                    solutions[painPointIndex] = [];
+                }
+                solutions[painPointIndex].push(solution);
+                textarea.value = '';
+                updateSolutionsList(painPointIndex);
+                updateNextButton();
+                updatePoints(10, 'Custom solution added!');
+                updateRemainingPainPoints();
+                
+                const totalSolutions = Object.values(solutions).flat().length;
+                if (totalSolutions === 3) {
+                    earnBadge('badge-solution');
+                }
+            }
+        }
+
+        function updateSolutionsList(painPointIndex) {
+            const list = document.getElementById(`solutionsList${painPointIndex}`);
+            if (!solutions[painPointIndex]) {
+                solutions[painPointIndex] = [];
+            }
+            list.innerHTML = solutions[painPointIndex].map((solution, solutionIndex) => `
+                <div class="solution-item">
+                    <span>${solution}</span>
+                    <button class="remove-btn" onclick="removeSolution(${painPointIndex}, ${solutionIndex})">❌</button>
+                </div>
+            `).join('');
+        }
+
+        function removeSolution(painPointIndex, solutionIndex) {
+            solutions[painPointIndex].splice(solutionIndex, 1);
+            updateSolutionsList(painPointIndex);
+            updateNextButton();
+            updateRemainingPainPoints();
+        }
+
+        function nextLevel() {
+            if (currentLevel === 1 && selectedWorkflow === 'custom') {
+                customWorkflow = document.getElementById('customWorkflowInput').value.trim();
+            }
+
+            if (currentLevel === 2) {
+                setupSolutionsLevel();
+            }
+
+            if (currentLevel === 3) {
+                setupResults();
+            }
+
+            currentLevel++;
+            showLevel(currentLevel);
+            updateProgress();
+            updateNavigation();
+        }
+
+        function previousLevel() {
+            currentLevel--;
+            showLevel(currentLevel);
+            updateProgress();
+            updateNavigation();
+        }
+
+        function showLevel(level) {
+            document.querySelectorAll('.level').forEach(l => l.classList.remove('active'));
+            if (level === 0) {
+                document.getElementById('overview').classList.add('active');
+            } else if (level <= 3) {
+                document.getElementById(`level${level}`).classList.add('active');
+            } else {
+                document.getElementById('results').classList.add('active');
+            }
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.style.display = currentLevel <= 0 ? 'none' : 'flex';
+            
+            if (currentLevel >= 4) {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            } else if (currentLevel === 3) {
+                nextBtn.innerHTML = '🎯 Complete Mission!';
+            } else {
+                nextBtn.innerHTML = 'Next Step ➡️';
+            }
+
+            updateNextButton();
+        }
+
+        function setupResults() {
+            earnBadge('badge-complete');
+            
+            const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
+            const totalSolutions = Object.values(solutions).flat().length;
+            
+            document.getElementById('finalScore').textContent = totalPoints;
+            
+            let scoreMessage = '';
+            if (totalPoints >= 100) {
+                scoreMessage = "🌟 Master Detective! You've uncovered amazing AI opportunities!";
+            } else if (totalPoints >= 70) {
+                scoreMessage = "🎯 Expert Detective! Great job identifying key improvements!";
+            } else if (totalPoints >= 40) {
+                scoreMessage = "👏 Good Detective Work! You're on the right track!";
+            } else {
+                scoreMessage = "🌱 Novice Detective - Keep exploring more opportunities!";
+            }
+            
+            document.getElementById('scoreMessage').textContent = scoreMessage;
+
+            const summary = document.getElementById('workflowSummary');
+            summary.innerHTML = `
+                <div class="workflow-summary">
+                    <h3 style="color: #1c487b;">🎯 Workflow: ${workflowTitle}</h3>
+                    
+                    <h4 style="color: #f18f38; margin-top: 20px;">🔍 Pain Points Identified (${painPoints.length}):</h4>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        ${painPoints.map((point, index) => {
+                            const hasSolutions = solutions[index] && solutions[index].length > 0;
+                            const statusEmoji = hasSolutions ? '✅' : '⭕';
+                            return `<li>${statusEmoji} ${point.text} ${hasSolutions ? `(${solutions[index].length} solutions)` : '(no solutions yet)'}</li>`;
+                        }).join('')}
+                    </ul>
+                    
+                    <h4 style="color: #1ab1d2; margin-top: 20px;">🤖 AI Enhancement Solutions (${totalSolutions}):</h4>
+                    ${painPoints.map((point, index) => {
+                        if (!solutions[index] || solutions[index].length === 0) return '';
+                        return `
+                            <div style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                <strong>For "${point.text}":</strong>
+                                <ul style="margin-left: 20px; margin-top: 8px;">
+                                    ${solutions[index].map(solution => `<li>${solution}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }).join('')}
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #e8f6f8; border-radius: 8px;">
+                        <strong>🎯 Quick Win Recommendation:</strong>
+                        <p style="margin-top: 8px;">Start with the pain point you focused on first and implement one AI solution this week. Measure the time saved and share the success with your team!</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generatePDF() {
+            try {
+                const { jsPDF } = window.jspdf;
+                if (!jsPDF) {
+                    showNotification('PDF library not loaded. Please refresh and try again.', 'error');
+                    return;
+                }
+                
+                showNotification('Generating PDF... Please wait.', 'success');
+                
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.width;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 20;
+                const contentWidth = pageWidth - (margin * 2);
+                
+                const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
+                
+                let yPosition = margin;
+                
+                // Header - Mission Complete
+                doc.setFillColor(254, 244, 227); // Cream background
+                doc.roundedRect(margin, yPosition, contentWidth, 30, 5, 5, 'F');
+                
+                doc.setFontSize(20);
+                doc.setTextColor(28, 72, 123);
+                doc.text('🎉 Mission Complete!', pageWidth/2, yPosition + 12, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.setTextColor(108, 117, 125);
+                doc.text('You\'ve successfully mapped your AI enhancement journey!', pageWidth/2, yPosition + 22, { align: 'center' });
+                
+                yPosition += 40;
+                
+                // Score display
+                doc.setFontSize(16);
+                doc.setTextColor(28, 72, 123);
+                doc.text(`Final Score: ${totalPoints} Points!`, pageWidth/2, yPosition, { align: 'center' });
+                
+                let scoreMessage = '';
+                if (totalPoints >= 100) {
+                    scoreMessage = "🌟 Master Detective! You've uncovered amazing AI opportunities!";
+                } else if (totalPoints >= 70) {
+                    scoreMessage = "🎯 Expert Detective! Great job identifying key improvements!";
+                } else if (totalPoints >= 40) {
+                    scoreMessage = "👏 Good Detective Work! You're on the right track!";
+                } else {
+                    scoreMessage = "🌱 Novice Detective - Keep exploring more opportunities!";
+                }
+                
+                doc.setFontSize(11);
+                doc.setTextColor(108, 117, 125);
+                const scoreLines = doc.splitTextToSize(scoreMessage, contentWidth - 20);
+                scoreLines.forEach((line, idx) => {
+                    doc.text(line, pageWidth/2, yPosition + 12 + (idx * 6), { align: 'center' });
+                });
+                
+                yPosition += 20 + (scoreLines.length * 6);
+                
+                // Main content box
+                doc.setFillColor(232, 246, 248); // Light blue
+                doc.roundedRect(margin, yPosition, contentWidth, pageHeight - yPosition - margin - 20, 5, 5, 'F');
+                
+                yPosition += 15;
+                
+                // Title
+                doc.setFontSize(18);
+                doc.setTextColor(28, 72, 123);
+                doc.text('📋 Your AI-Augmented Workflow Plan', margin + 10, yPosition);
+                
+                yPosition += 10;
+                
+                // White content area
+                doc.setFillColor(255, 255, 255);
+                doc.roundedRect(margin + 10, yPosition, contentWidth - 20, pageHeight - yPosition - margin - 35, 3, 3, 'F');
+                
+                yPosition += 15;
+                
+                // Workflow
+                doc.setFontSize(14);
+                doc.setTextColor(28, 72, 123);
+                doc.text(`🎯 Workflow: ${workflowTitle}`, margin + 20, yPosition);
+                
+                yPosition += 15;
+                
+                // Pain Points
+                doc.setFontSize(13);
+                doc.setTextColor(241, 143, 56);
+                doc.text(`🔍 Pain Points Identified (${painPoints.length}):`, margin + 20, yPosition);
+                
+                yPosition += 10;
+                doc.setFontSize(11);
+                doc.setTextColor(51, 51, 51);
+                
+                painPoints.forEach((point, index) => {
+                    if (yPosition > pageHeight - 60) {
+                        doc.addPage();
+                        yPosition = margin + 20;
+                    }
+                    
+                    const hasSolutions = solutions[index] && solutions[index].length > 0;
+                    const statusEmoji = hasSolutions ? '✅' : '⭕';
+                    const solutionCount = hasSolutions ? ` (${solutions[index].length} solutions)` : ' (no solutions yet)';
+                    
+                    const painText = `${statusEmoji} ${point.text}${solutionCount}`;
+                    const lines = doc.splitTextToSize(painText, contentWidth - 50);
+                    
+                    lines.forEach(line => {
+                        doc.text(line, margin + 25, yPosition);
+                        yPosition += 6;
+                    });
+                    
+                    yPosition += 3;
+                });
+                
+                yPosition += 10;
+                
+                // AI Solutions
+                const totalSolutions = Object.values(solutions).flat().length;
+                doc.setFontSize(13);
+                doc.setTextColor(26, 177, 210);
+                doc.text(`🤖 AI Enhancement Solutions (${totalSolutions}):`, margin + 20, yPosition);
+                
+                yPosition += 10;
+                
+                painPoints.forEach((point, index) => {
+                    if (solutions[index] && solutions[index].length > 0) {
+                        if (yPosition > pageHeight - 50) {
+                            doc.addPage();
+                            yPosition = margin + 20;
+                        }
+                        
+                        // Solution box
+                        const boxStartY = yPosition;
+                        let boxHeight = 15;
+                        
+                        // Calculate box height
+                        const titleLines = doc.splitTextToSize(`For "${point.text}":`, contentWidth - 60);
+                        boxHeight += titleLines.length * 6;
+                        
+                        solutions[index].forEach(solution => {
+                            const solutionLines = doc.splitTextToSize(`• ${solution}`, contentWidth - 70);
+                            boxHeight += solutionLines.length * 5 + 2;
+                        });
+                        
+                        // Draw box
+                        doc.setFillColor(248, 249, 250);
+                        doc.roundedRect(margin + 25, boxStartY, contentWidth - 50, boxHeight, 3, 3, 'F');
+                        
+                        yPosition += 8;
+                        
+                        // Title
+                        doc.setFontSize(11);
+                        doc.setTextColor(51, 51, 51);
+                        doc.setFont(undefined, 'bold');
+                        titleLines.forEach(line => {
+                            doc.text(line, margin + 30, yPosition);
+                            yPosition += 6;
+                        });
+                        
+                        yPosition += 3;
+                        
+                        // Solutions
+                        doc.setFont(undefined, 'normal');
+                        doc.setFontSize(10);
+                        
+                        solutions[index].forEach(solution => {
+                            const solutionLines = doc.splitTextToSize(`• ${solution}`, contentWidth - 70);
+                            solutionLines.forEach(line => {
+                                doc.text(line, margin + 35, yPosition);
+                                yPosition += 5;
+                            });
+                            yPosition += 2;
+                        });
+                        
+                        yPosition += 8;
+                    }
+                });
+                
+                // Next Steps (if space allows)
+                if (yPosition < pageHeight - 80) {
+                    yPosition += 10;
+                    
+                    doc.setFillColor(254, 244, 227);
+                    doc.roundedRect(margin + 25, yPosition, contentWidth - 50, 50, 3, 3, 'F');
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(28, 72, 123);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('🚀 Next Steps:', margin + 30, yPosition + 12);
+                    
+                    doc.setFont(undefined, 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(51, 51, 51);
+                    
+                    const steps = [
+                        '1. Pick your highest-priority pain point to tackle first',
+                        '2. Try one AI solution for a week and measure the time saved',
+                        '3. Share your plan with your team for feedback',
+                        '4. Celebrate small wins - every minute saved is a victory!'
+                    ];
+                    
+                    let stepY = yPosition + 20;
+                    steps.forEach(step => {
+                        const stepLines = doc.splitTextToSize(step, contentWidth - 70);
+                        stepLines.forEach(line => {
+                            doc.text(line, margin + 30, stepY);
+                            stepY += 5;
+                        });
+                    });
+                }
+                
+                // Footer
+                doc.setFontSize(9);
+                doc.setTextColor(108, 117, 125);
+                doc.text('AI Workflow Detective - COMPAS Edition | Project Evident', pageWidth/2, pageHeight - 10, { align: 'center' });
+                
+                // Metadata
+                doc.setProperties({
+                    title: `AI Workflow Enhancement Plan - ${workflowTitle}`,
+                    subject: 'AI-Human Collaboration Workflow Analysis',
+                    author: 'AI Workflow Detective - Project Evident',
+                    keywords: 'AI, workflow, enhancement, COMPAS',
+                    creator: 'Project Evident'
+                });
+                
+                doc.save(`AI-Workflow-Plan-${workflowTitle.replace(/\s+/g, '-')}.pdf`);
+                showNotification('PDF downloaded successfully! 📄', 'success');
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showNotification('Error generating PDF. Please try again.', 'error');
+            }
+        }
+
+        function resetGame() {
+            if (confirm('Are you sure you want to start over? Your current progress will be lost.')) {
+                currentLevel = 0;
+                selectedWorkflow = '';
+                customWorkflow = '';
+                painPoints = [];
+                currentPainPointIndex = -1;
+                solutions = {};
+                totalPoints = 0;
+                earnedBadges = [];
+                
+                document.querySelectorAll('.workflow-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                document.querySelectorAll('.badge').forEach(badge => {
+                    badge.classList.remove('earned');
+                });
+                
+                document.getElementById('customWorkflowSection').style.display = 'none';
+                document.getElementById('customWorkflowInput').value = '';
+                document.getElementById('painPointInput').value = '';
+                document.getElementById('painPointList').innerHTML = '';
+                document.getElementById('selectedPainPointSection').style.display = 'none';
+                document.getElementById('pointsDisplay').textContent = '0';
+                
+                document.querySelectorAll('.compas-step').forEach(step => {
+                    step.classList.remove('active', 'completed');
+                });
+                
+                showLevel(0);
+                updateProgress();
+                updateNavigation();
+                
+                showNotification('Game reset! Ready for a new mission? 🕵️', 'success');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('customWorkflowInput').addEventListener('input', updateNextButton);
+            
+            document.getElementById('painPointInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addPainPoint();
+                }
+            });
+
+            updateNavigation();
+            
+            // Add some initial animation
+            setTimeout(() => {
+                showNotification('Welcome, Detective! Ready to enhance your workflow? 🕵️', 'success');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
