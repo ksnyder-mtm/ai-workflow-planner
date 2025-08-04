@@ -2168,27 +2168,39 @@
                                 ${solutions[index].map(solution => {
                                     // Handle both superpower cards and custom typed solutions
                                     let solutionText = '';
-                                    let isUserTyped = false;
+                                    let solutionType = 'unknown';
                                     
                                     if (typeof solution === 'string') {
                                         solutionText = solution;
-                                        // Check if it's a generic superpower (contains emoji and colon)
-                                        isUserTyped = !solution.match(/^[📝🗂🔍💡🎯🔄]+\s*\w+:/);
+                                        // Check if it's an AI superpower (emoji + word + colon + description)
+                                        if (solution.match(/^[📝✍️📊🗂️🌐💡]\s*(Summarizing|Drafting|Analyzing|Organizing|Translating|Brainstorming):/)) {
+                                            solutionType = 'superpower';
+                                        } else {
+                                            solutionType = 'user-typed';
+                                        }
                                     } else if (solution && solution.text) {
                                         solutionText = solution.text;
-                                        isUserTyped = true;
+                                        solutionType = 'user-typed';
                                     } else if (solution && solution.description) {
                                         solutionText = solution.description;
-                                        isUserTyped = true;
+                                        solutionType = 'user-typed';
                                     } else {
                                         solutionText = 'AI solution';
+                                        solutionType = 'unknown';
                                     }
                                     
-                                    const style = isUserTyped ? 
-                                        'margin-bottom: 3px; background: #e8f6f8; padding: 8px; border-radius: 4px; border-left: 3px solid #1ab1d2; font-style: italic;' : 
-                                        'margin-bottom: 3px;';
+                                    let style = 'margin-bottom: 3px;';
+                                    let label = '';
                                     
-                                    return `<li style="${style}">${isUserTyped ? '<strong>Your specific plan:</strong> ' : ''}${solutionText}</li>`;
+                                    if (solutionType === 'superpower') {
+                                        style = 'margin-bottom: 3px; background: #fff3e0; padding: 8px; border-radius: 4px; border-left: 3px solid #ff9800;';
+                                        label = '<strong>AI Capability:</strong> ';
+                                    } else if (solutionType === 'user-typed') {
+                                        style = 'margin-bottom: 3px; background: #e8f6f8; padding: 8px; border-radius: 4px; border-left: 3px solid #1ab1d2; font-style: italic;';
+                                        label = '<strong>Your specific plan:</strong> ';
+                                    }
+                                    
+                                    return `<li style="${style}">${label}${solutionText}</li>`;
                                 }).join('')}
                             </ul>
                             ${existingTools[index] || neededTools[index] ? `
