@@ -138,15 +138,15 @@ Users will learn to:
 
 ## 🤝 Contributing
 
-This project is developed for Project Evident's educational initiatives. For contributions or suggestions, please contact the development team.
+This project is developed for Meet the Moment's educational initiatives. For contributions or suggestions, please contact the development team.
 
 ## 📄 License
 
 MIT License - feel free to adapt for educational and nonprofit use.
 
-## 🏢 About Project Evident
+## 🏢 About Meet the Moment
 
-Project Evident helps nonprofits use evidence and data to increase their impact. This tool is part of our AI literacy and capacity building initiatives.
+Meet the Moment helps nonprofits use evidence and data to increase their impact. This tool is part of our AI literacy and capacity building initiatives.
 
 ---
 
