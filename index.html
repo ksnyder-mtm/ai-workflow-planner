@@ -1286,9 +1286,6 @@
                             <button class="download-btn" onclick="printFriendly()" style="background: #f18f38; font-size: 1.1rem;">
                                 🖨️ Print to PDF (Recommended)
                             </button>
-                            <button class="download-btn" onclick="generateCleanPDF()" style="background: #1c487b;">
-                                📄 Simple PDF
-                            </button>
                             <button class="download-btn" onclick="generateScreenshotPDF()" style="background: #1ab1d2;">
                                 📸 Screenshot PDF
                             </button>
@@ -2061,15 +2058,15 @@
                 // Footer
                 doc.setFontSize(9);
                 doc.setTextColor(108, 117, 125);
-                doc.text('AI Workflow Detective - COMPAS Edition | Project Evident', pageWidth/2, pageHeight - 10, { align: 'center' });
+                doc.text('AI Workflow Detective - COMPAS Edition | Meet the Moment', pageWidth/2, pageHeight - 10, { align: 'center' });
                 
                 // Metadata
                 doc.setProperties({
                     title: `AI Workflow Enhancement Plan - ${workflowTitle}`,
                     subject: 'AI-Human Collaboration Workflow Analysis',
-                    author: 'AI Workflow Detective - Project Evident',
+                    author: 'AI Workflow Detective - Meet the Moment',
                     keywords: 'AI, workflow, enhancement, COMPAS',
-                    creator: 'Project Evident'
+                    creator: 'Meet the Moment'
                 });
                 
                 doc.save(`AI-Workflow-Plan-${workflowTitle.replace(/\s+/g, '-')}.pdf`);
@@ -2197,12 +2194,18 @@
                 const resultsElement = document.getElementById('results');
                 
                 html2canvas(resultsElement, {
-                    scale: 2,
+                    scale: 3,
                     useCORS: true,
                     allowTaint: false,
                     backgroundColor: '#ffffff',
                     removeContainer: true,
-                    logging: false
+                    logging: false,
+                    width: resultsElement.scrollWidth,
+                    height: resultsElement.scrollHeight,
+                    scrollX: 0,
+                    scrollY: 0,
+                    foreignObjectRendering: true,
+                    imageTimeout: 15000
                 }).then(canvas => {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
@@ -2213,13 +2216,14 @@
                     let heightLeft = imgHeight;
                     let position = 10;
                     
-                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, position, imgWidth, imgHeight);
+                    const imgData = canvas.toDataURL('image/png');
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                     
                     while (heightLeft >= 0) {
                         position = heightLeft - imgHeight;
                         pdf.addPage();
-                        pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, position, imgWidth, imgHeight);
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
                         heightLeft -= pageHeight;
                     }
                     
@@ -2255,8 +2259,17 @@
             
             let painPointsHTML = '';
             painPoints.forEach((point, index) => {
-                // Ensure point is a string, not an object
-                const pointText = typeof point === 'string' ? point : (point.text || point.description || 'Unknown pain point');
+                // Handle different pain point formats - it's stored as an object with text property
+                let pointText = '';
+                if (typeof point === 'string') {
+                    pointText = point;
+                } else if (point && point.text) {
+                    pointText = point.text;
+                } else if (point && point.description) {
+                    pointText = point.description;
+                } else {
+                    pointText = 'Unknown pain point';
+                }
                 
                 painPointsHTML += `
                     <div style="margin-bottom: 15px; padding: 10px; border-left: 3px solid #333;">
@@ -2267,7 +2280,16 @@
                             <ul style="margin-top: 5px;">
                                 ${solutions[index].map(solution => {
                                     // Handle both superpower cards and custom typed solutions
-                                    const solutionText = typeof solution === 'string' ? solution : (solution.text || solution.description || 'AI solution');
+                                    let solutionText = '';
+                                    if (typeof solution === 'string') {
+                                        solutionText = solution;
+                                    } else if (solution && solution.text) {
+                                        solutionText = solution.text;
+                                    } else if (solution && solution.description) {
+                                        solutionText = solution.description;
+                                    } else {
+                                        solutionText = 'AI solution';
+                                    }
                                     return `<li style="margin-bottom: 3px;">${solutionText}</li>`;
                                 }).join('')}
                             </ul>
