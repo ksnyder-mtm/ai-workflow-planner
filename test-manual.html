@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Workflow Detective - Test</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <style>
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 9999;
+            max-width: 300px;
+        }
+        .debug-panel h4 {
+            margin: 0 0 10px 0;
+            color: #1ab1d2;
+        }
+        .debug-panel pre {
+            margin: 5px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug panel -->
+    <div class="debug-panel">
+        <h4>Debug Info</h4>
+        <div id="debug-content">Initializing...</div>
+    </div>
+    
+    <!-- Main application container -->
+    <div id="app"></div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/config.js"></script>
+    <script src="js/modules/Templates.js"></script>
+    <script src="js/modules/UI.js"></script>
+    <script src="js/modules/WorkflowMethods.js"></script>
+    <script src="js/modules/DragDropHandler.js"></script>
+    <script src="js/AIWorkflowDetective.js"></script>
+    
+    <!-- Test Script -->
+    <script>
+        let app;
+        let debugEl;
+        
+        function updateDebug(info) {
+            if (debugEl) {
+                debugEl.innerHTML = `
+                    <strong>Level:</strong> ${app ? app.state.currentLevel : 'N/A'}<br>
+                    <strong>Workflow:</strong> ${app ? app.state.selectedWorkflow : 'N/A'}<br>
+                    <strong>Pain Points:</strong> ${app ? app.state.painPoints.length : 0}<br>
+                    <strong>Points:</strong> ${app ? app.state.totalPoints : 0}<br>
+                    <strong>Status:</strong> ${info || 'Unknown'}
+                `;
+            }
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            debugEl = document.getElementById('debug-content');
+            updateDebug('DOM Loaded');
+            
+            try {
+                // Test configuration
+                const config = {
+                    points: {
+                        workflowSelect: 10,
+                        customWorkflow: 15,
+                        painPointAdd: 5,
+                        painPointSelect: 10,
+                        solutionAdd: 10,
+                        toolsSave: 5,
+                        badgeEarn: 20
+                    },
+                    animations: {
+                        duration: 300,
+                        notificationDuration: 3000
+                    }
+                };
+                
+                updateDebug('Config created');
+                
+                // Create and initialize the application
+                app = new AIWorkflowDetective(config);
+                updateDebug('App created');
+                
+                app.init();
+                updateDebug('App initialized');
+                
+                // Expose app to window for testing
+                window.app = app;
+                window.testApp = testApp;
+                
+                // Set up debug updates
+                setInterval(() => updateDebug('Running'), 2000);
+                
+                console.log('AI Workflow Detective initialized successfully!');
+                console.log('Use window.testApp() to run automated tests');
+                
+            } catch (error) {
+                console.error('Initialization error:', error);
+                updateDebug('Error: ' + error.message);
+            }
+        });
+
+        // Global help function
+        function showHelp(topic) {
+            const helpContent = {
+                overview: "This tool helps you identify workflows that could benefit from AI enhancement.",
+                workflow: "Choose the type of work that takes up too much of your time.",
+                pain: "Think about specific tasks that are repetitive, time-consuming, or error-prone.",
+                solution: "Match AI capabilities to your pain points."
+            };
+            
+            if (app) {
+                app.showNotification(helpContent[topic] || "Help available!", 'success');
+            }
+        }
+        
+        // Automated test function
+        function testApp() {
+            console.log('Starting automated test...');
+            updateDebug('Testing started');
+            
+            setTimeout(() => {
+                // Test 1: Start detective work
+                console.log('Test 1: Starting detective work');
+                app.startDetectiveWork();
+                updateDebug('Started detective work');
+                
+                setTimeout(() => {
+                    // Test 2: Select workflow
+                    console.log('Test 2: Selecting workflow');
+                    app.selectWorkflow('meetings');
+                    updateDebug('Selected meetings workflow');
+                    
+                    setTimeout(() => {
+                        // Test 3: Test navigation button
+                        console.log('Test 3: Testing Next button click');
+                        const nextBtn = document.getElementById('nextBtn');
+                        if (nextBtn) {
+                            console.log('Next button found, clicking...');
+                            nextBtn.click();
+                            updateDebug('Next button clicked');
+                        } else {
+                            console.error('Next button not found!');
+                            updateDebug('ERROR: Next button missing');
+                        }
+                        
+                        setTimeout(() => {
+                            console.log('Current level after click:', app.state.currentLevel);
+                            updateDebug('Level: ' + app.state.currentLevel);
+                        
+                        setTimeout(() => {
+                            // Test 4: Add pain point
+                            console.log('Test 4: Adding pain point');
+                            // Simulate user input
+                            const input = document.getElementById('painPointInput');
+                            if (input) {
+                                input.value = 'Taking meeting notes while facilitating';
+                                app.addPainPoint();
+                                updateDebug('Added pain point');
+                                
+                                setTimeout(() => {
+                                    // Test 5: Select pain point
+                                    console.log('Test 5: Selecting pain point');
+                                    app.selectPainPoint(0);
+                                    updateDebug('Selected pain point');
+                                    
+                                    setTimeout(() => {
+                                        // Test 6: Go to solutions
+                                        console.log('Test 6: Going to solutions');
+                                        app.nextLevel();
+                                        updateDebug('Moved to solutions');
+                                        
+                                        setTimeout(() => {
+                                            // Test 7: Add solution
+                                            console.log('Test 7: Adding solution');
+                                            app.addSolution(0, 'AI meeting transcription and note-taking');
+                                            updateDebug('Added solution');
+                                            
+                                            setTimeout(() => {
+                                                // Test 8: Go to results
+                                                console.log('Test 8: Going to results');
+                                                app.nextLevel();
+                                                updateDebug('Test completed successfully!');
+                                                console.log('All tests passed!');
+                                            }, 1000);
+                                        }, 1000);
+                                    }, 1000);
+                                }, 1000);
+                            }
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

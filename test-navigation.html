@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test - AI Workflow Detective</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .test-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #1c487b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+        .test-btn {
+            background: #f18f38;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .test-btn:hover {
+            background: #e67e28;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h4>🧪 Navigation Test Panel</h4>
+        <div id="status">Initializing...</div>
+        <br>
+        <button class="test-btn" onclick="testNavigation()">Test Navigation Flow</button>
+        <button class="test-btn" onclick="checkButtons()">Check Buttons</button>
+        <button class="test-btn" onclick="resetApp()">Reset App</button>
+    </div>
+
+    <div id="app"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/modules/Templates.js"></script>
+    <script src="js/modules/UI.js"></script>
+    <script src="js/modules/WorkflowMethods.js"></script>
+    <script src="js/modules/DragDropHandler.js"></script>
+    <script src="js/AIWorkflowDetective.js"></script>
+    
+    <script>
+        let app;
+        let statusEl;
+        
+        function updateStatus(message) {
+            if (statusEl) {
+                statusEl.innerHTML = message;
+            }
+            console.log('STATUS:', message);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            statusEl = document.getElementById('status');
+            
+            try {
+                updateStatus('Creating app...');
+                app = new AIWorkflowDetective();
+                
+                updateStatus('Initializing app...');
+                app.init();
+                
+                updateStatus(`✅ Ready! Level: ${app.state.currentLevel}`);
+                window.app = app; // For debugging
+                
+            } catch (error) {
+                updateStatus(`❌ Error: ${error.message}`);
+                console.error('Initialization error:', error);
+            }
+        });
+
+        function checkButtons() {
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            
+            updateStatus(`
+                Next: ${nextBtn ? '✅ Found' : '❌ Missing'}<br>
+                Prev: ${prevBtn ? '✅ Found' : '❌ Missing'}<br>
+                Level: ${app ? app.state.currentLevel : 'N/A'}<br>
+                Workflow: ${app ? app.state.selectedWorkflow : 'N/A'}
+            `);
+        }
+
+        function testNavigation() {
+            if (!app) {
+                updateStatus('❌ App not initialized');
+                return;
+            }
+
+            updateStatus('🧪 Starting full navigation test...');
+            
+            // Step 1: Start detective work
+            setTimeout(() => {
+                updateStatus('Step 1: Starting detective work');
+                app.startDetectiveWork();
+                
+                setTimeout(() => {
+                    updateStatus(`After start: Level ${app.state.currentLevel}`);
+                    
+                    // Step 2: Select workflow
+                    setTimeout(() => {
+                        updateStatus('Step 2: Selecting meetings workflow');
+                        app.selectWorkflow('meetings');
+                        
+                        setTimeout(() => {
+                            updateStatus(`After workflow selection: Level ${app.state.currentLevel}`);
+                            
+                            // Step 3: Go to pain points level
+                            setTimeout(() => {
+                                updateStatus('Step 3: Going to pain points (Level 2)');
+                                const nextBtn = document.getElementById('nextBtn');
+                                if (nextBtn) {
+                                    nextBtn.click();
+                                    
+                                    setTimeout(() => {
+                                        updateStatus(`Now at Level: ${app.state.currentLevel}`);
+                                        
+                                        // Step 4: Add a pain point
+                                        setTimeout(() => {
+                                            updateStatus('Step 4: Adding pain point');
+                                            // Simulate adding pain point
+                                            const input = document.getElementById('painPointInput');
+                                            if (input) {
+                                                input.value = 'Taking meeting notes while facilitating';
+                                                app.addPainPoint();
+                                                
+                                                setTimeout(() => {
+                                                    updateStatus(`Pain points: ${app.state.painPoints.length}`);
+                                                    
+                                                    // Step 5: Select the pain point
+                                                    setTimeout(() => {
+                                                        updateStatus('Step 5: Selecting pain point');
+                                                        app.selectPainPoint(0);
+                                                        
+                                                        setTimeout(() => {
+                                                            updateStatus(`Selected index: ${app.state.currentPainPointIndex}`);
+                                                            
+                                                            // Step 6: Try to go to solutions level
+                                                            setTimeout(() => {
+                                                                updateStatus('Step 6: Attempting to go to solutions');
+                                                                const nextBtn2 = document.getElementById('nextBtn');
+                                                                if (nextBtn2) {
+                                                                    nextBtn2.click();
+                                                                    setTimeout(() => {
+                                                                        updateStatus(`✅ Final Level: ${app.state.currentLevel}`);
+                                                                    }, 500);
+                                                                } else {
+                                                                    updateStatus('❌ Next button not found');
+                                                                }
+                                                            }, 500);
+                                                        }, 500);
+                                                    }, 500);
+                                                }, 500);
+                                            } else {
+                                                updateStatus('❌ Pain point input not found');
+                                            }
+                                        }, 500);
+                                    }, 500);
+                                } else {
+                                    updateStatus('❌ Next button not found');
+                                }
+                            }, 500);
+                        }, 500);
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+
+        function resetApp() {
+            if (app) {
+                app.reset();
+                updateStatus(`🔄 Reset! Level: ${app.state.currentLevel}`);
+            }
+        }
+
+        // Global help function
+        function showHelp(topic) {
+            if (app) {
+                app.showNotification('Help clicked: ' + topic, 'success');
+            }
+        }
+    </script>
+</body>
+</html>
