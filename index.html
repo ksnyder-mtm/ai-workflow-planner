@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Workflow Detective - COMPAS Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
@@ -834,6 +835,99 @@
                 display: none;
             }
         }
+
+        /* Print-friendly styles for PDF generation */
+        .pdf-content {
+            background: white;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #1c487b;
+            padding-bottom: 20px;
+        }
+
+        .pdf-header h1 {
+            color: #1c487b;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .pdf-header h2 {
+            color: #f18f38;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .pdf-section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+        }
+
+        .pdf-section h3 {
+            color: #1c487b;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid #1ab1d2;
+            padding-left: 12px;
+        }
+
+        .pdf-pain-point {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #f18f38;
+        }
+
+        .pdf-pain-point h4 {
+            color: #f18f38;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .pdf-solution {
+            margin: 10px 0 10px 20px;
+            padding: 8px 0;
+        }
+
+        .pdf-solution::before {
+            content: "• ";
+            color: #1ab1d2;
+            font-weight: bold;
+        }
+
+        .pdf-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #1c487b;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        @media print {
+            body { 
+                background: white !important; 
+            }
+            .container, .header, .progress-bar, .navigation, .game-area {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+            .level:not(.active) { 
+                display: none !important; 
+            }
+            .navigation { 
+                display: none !important; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -1188,9 +1282,17 @@
                     </div>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <button class="download-btn" onclick="generatePDF()">
-                            📄 Download Your Plan as PDF
-                        </button>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                            <button class="download-btn" onclick="generateCleanPDF()" style="background: #1c487b;">
+                                📄 Download Clean PDF
+                            </button>
+                            <button class="download-btn" onclick="generateScreenshotPDF()" style="background: #1ab1d2;">
+                                📸 Screenshot PDF
+                            </button>
+                            <button class="download-btn" onclick="printFriendly()" style="background: #f18f38;">
+                                🖨️ Print Version
+                            </button>
+                        </div>
                         <button class="reset-btn" onclick="resetGame()">🔄 Start Over</button>
                     </div>
                 </div>
@@ -1974,6 +2076,201 @@
                 console.error('PDF generation error:', error);
                 showNotification('Error generating PDF. Please try again.', 'error');
             }
+        }
+
+        // Clean PDF generation using html2pdf.js - best option
+        function generateCleanPDF() {
+            try {
+                showNotification('Generating clean PDF... Please wait.', 'success');
+                
+                const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
+                const pdfContent = createPDFContent();
+                
+                const options = {
+                    margin: 20,
+                    filename: `AI-Workflow-Plan-${workflowTitle.replace(/\s+/g, '-')}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true,
+                        allowTaint: false
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    }
+                };
+
+                html2pdf().set(options).from(pdfContent).save().then(() => {
+                    showNotification('Clean PDF downloaded successfully!', 'success');
+                    updatePoints(10, 'Downloaded clean PDF');
+                }).catch(error => {
+                    console.error('Clean PDF generation error:', error);
+                    showNotification('Clean PDF failed. Try Screenshot PDF instead.', 'error');
+                });
+                
+            } catch (error) {
+                console.error('Clean PDF error:', error);
+                showNotification('Clean PDF not available. Try Screenshot PDF.', 'error');
+            }
+        }
+
+        // Screenshot PDF using html2canvas + jsPDF
+        function generateScreenshotPDF() {
+            try {
+                showNotification('Taking screenshot for PDF... Please wait.', 'success');
+                
+                const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
+                const resultsElement = document.getElementById('results');
+                
+                html2canvas(resultsElement, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: '#ffffff',
+                    removeContainer: true,
+                    logging: false
+                }).then(canvas => {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    const imgWidth = 190;
+                    const pageHeight = 277;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 10;
+                    
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    pdf.save(`AI-Workflow-Plan-Screenshot-${workflowTitle.replace(/\s+/g, '-')}.pdf`);
+                    showNotification('Screenshot PDF downloaded successfully!', 'success');
+                    updatePoints(8, 'Downloaded screenshot PDF');
+                }).catch(error => {
+                    console.error('Screenshot PDF error:', error);
+                    showNotification('Screenshot failed. Try Print Version instead.', 'error');
+                });
+                
+            } catch (error) {
+                console.error('Screenshot PDF error:', error);
+                showNotification('Screenshot not available. Try Print Version.', 'error');
+            }
+        }
+
+        // Print-friendly version
+        function printFriendly() {
+            const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
+            const pdfContent = createPDFContent();
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>AI Workflow Plan - ${workflowTitle}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+                        .pdf-content { max-width: 800px; margin: 0 auto; }
+                        .pdf-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1c487b; padding-bottom: 15px; }
+                        .pdf-header h1 { color: #1c487b; margin-bottom: 10px; }
+                        .pdf-header h2 { color: #f18f38; font-weight: normal; }
+                        .pdf-section { margin-bottom: 25px; page-break-inside: avoid; }
+                        .pdf-section h3 { color: #1c487b; border-left: 4px solid #1ab1d2; padding-left: 12px; }
+                        .pdf-pain-point { background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 5px solid #f18f38; }
+                        .pdf-pain-point h4 { color: #f18f38; margin-bottom: 10px; }
+                        .pdf-solution { margin: 8px 0 8px 20px; }
+                        .pdf-solution::before { content: "• "; color: #1ab1d2; font-weight: bold; }
+                        .pdf-footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #1c487b; text-align: center; color: #666; font-size: 12px; }
+                        @media print { body { margin: 0; } }
+                    </style>
+                </head>
+                <body>${pdfContent.innerHTML}</body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.focus();
+            
+            setTimeout(() => {
+                printWindow.print();
+                showNotification('Print dialog opened! Use "Save as PDF" in print options.', 'success');
+                updatePoints(5, 'Opened print version');
+            }, 500);
+        }
+
+        // Create clean PDF content
+        function createPDFContent() {
+            const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
+            
+            const pdfDiv = document.createElement('div');
+            pdfDiv.className = 'pdf-content';
+            
+            let calcPoints = painPoints.length * 5 + Object.values(solutions).flat().length * 10 + 10;
+            let scoreMessage = '';
+            if (calcPoints >= 100) {
+                scoreMessage = "Master Detective! You've uncovered amazing AI opportunities!";
+            } else if (calcPoints >= 70) {
+                scoreMessage = "Expert Detective! Great job identifying key improvements!";
+            } else if (calcPoints >= 40) {
+                scoreMessage = "Good Detective Work! You're on the right track!";
+            } else {
+                scoreMessage = "Novice Detective - Keep exploring more opportunities!";
+            }
+            
+            pdfDiv.innerHTML = `
+                <div class="pdf-header">
+                    <h1>Mission Complete!</h1>
+                    <h2>AI Workflow Detective - COMPAS Edition</h2>
+                    <p>You've successfully mapped your AI enhancement journey!</p>
+                    <p><strong>Final Score: ${calcPoints} Points!</strong></p>
+                    <p>${scoreMessage}</p>
+                </div>
+                
+                <div class="pdf-section">
+                    <h3>Your AI-Augmented Workflow Plan</h3>
+                    <p><strong>Selected Workflow:</strong> ${workflowTitle}</p>
+                </div>
+                
+                <div class="pdf-section">
+                    <h3>Pain Points Identified (${painPoints.length})</h3>
+                    ${painPoints.map((point, index) => `
+                        <div class="pdf-pain-point">
+                            <h4>Pain Point ${index + 1}</h4>
+                            <p>${point}</p>
+                            ${solutions[index] && solutions[index].length > 0 ? `
+                                <p><strong>AI Solutions:</strong></p>
+                                ${solutions[index].map(solution => `<div class="pdf-solution">${solution}</div>`).join('')}
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="pdf-section">
+                    <h3>Next Steps</h3>
+                    <div class="pdf-solution">Start with the simplest AI solution first</div>
+                    <div class="pdf-solution">Test with a small pilot project</div>
+                    <div class="pdf-solution">Measure time saved and impact</div>
+                    <div class="pdf-solution">Expand successful solutions to other areas</div>
+                    <div class="pdf-solution">Celebrate small wins - every minute saved is a victory!</div>
+                </div>
+                
+                <div class="pdf-footer">
+                    <p>Generated by AI Workflow Detective - COMPAS Edition | Project Evident</p>
+                    <p>For more resources, visit your organization's AI learning materials</p>
+                </div>
+            `;
+            
+            return pdfDiv;
         }
 
         function resetGame() {
