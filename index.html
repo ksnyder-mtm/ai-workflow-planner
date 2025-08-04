@@ -1283,16 +1283,19 @@
                     
                     <div style="text-align: center; margin-top: 30px;">
                         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                            <button class="download-btn" onclick="printFriendly()" style="background: #f18f38; font-size: 1.1rem;">
+                                🖨️ Print to PDF (Recommended)
+                            </button>
                             <button class="download-btn" onclick="generateCleanPDF()" style="background: #1c487b;">
-                                📄 Download Clean PDF
+                                📄 Simple PDF
                             </button>
                             <button class="download-btn" onclick="generateScreenshotPDF()" style="background: #1ab1d2;">
                                 📸 Screenshot PDF
                             </button>
-                            <button class="download-btn" onclick="printFriendly()" style="background: #f18f38;">
-                                🖨️ Print Version
-                            </button>
                         </div>
+                        <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 15px;">
+                            💡 Tip: "Print to PDF" opens a new window where you can use your browser's print function and select "Save as PDF"
+                        </p>
                         <button class="reset-btn" onclick="resetGame()">🔄 Start Over</button>
                     </div>
                 </div>
@@ -2078,43 +2081,110 @@
             }
         }
 
-        // Clean PDF generation using html2pdf.js - best option
+        // Simple text-based PDF generation
         function generateCleanPDF() {
             try {
-                showNotification('Generating clean PDF... Please wait.', 'success');
+                const { jsPDF } = window.jspdf;
+                if (!jsPDF) {
+                    showNotification('PDF library not loaded. Please try Print Version instead.', 'error');
+                    return;
+                }
                 
+                showNotification('Generating simple PDF... Please wait.', 'success');
+                
+                const doc = new jsPDF();
                 const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
-                const pdfContent = createPDFContent();
                 
-                const options = {
-                    margin: 20,
-                    filename: `AI-Workflow-Plan-${workflowTitle.replace(/\s+/g, '-')}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2,
-                        useCORS: true,
-                        letterRendering: true,
-                        allowTaint: false
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait',
-                        compress: true
+                let yPos = 30;
+                const margin = 20;
+                const pageWidth = doc.internal.pageSize.width;
+                const lineHeight = 8;
+                
+                // Header
+                doc.setFontSize(18);
+                doc.setTextColor(0, 0, 0);
+                doc.text('AI Workflow Enhancement Plan', margin, yPos);
+                yPos += lineHeight * 2;
+                
+                // Workflow
+                doc.setFontSize(14);
+                doc.text('Workflow: ' + workflowTitle, margin, yPos);
+                yPos += lineHeight * 2;
+                
+                // Pain Points
+                doc.setFontSize(12);
+                doc.text('PAIN POINTS IDENTIFIED:', margin, yPos);
+                yPos += lineHeight;
+                
+                doc.setFontSize(10);
+                painPoints.forEach((point, index) => {
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 30;
                     }
-                };
-
-                html2pdf().set(options).from(pdfContent).save().then(() => {
-                    showNotification('Clean PDF downloaded successfully!', 'success');
-                    updatePoints(10, 'Downloaded clean PDF');
-                }).catch(error => {
-                    console.error('Clean PDF generation error:', error);
-                    showNotification('Clean PDF failed. Try Screenshot PDF instead.', 'error');
+                    const text = `${index + 1}. ${point}`;
+                    const lines = doc.splitTextToSize(text, pageWidth - margin * 2);
+                    lines.forEach(line => {
+                        doc.text(line, margin + 5, yPos);
+                        yPos += lineHeight;
+                    });
+                    yPos += 3;
                 });
                 
+                yPos += lineHeight;
+                
+                // Solutions
+                doc.setFontSize(12);
+                doc.text('AI SOLUTIONS:', margin, yPos);
+                yPos += lineHeight;
+                
+                doc.setFontSize(10);
+                painPoints.forEach((point, index) => {
+                    if (solutions[index] && solutions[index].length > 0) {
+                        if (yPos > 250) {
+                            doc.addPage();
+                            yPos = 30;
+                        }
+                        
+                        const headerText = `For: ${point}`;
+                        const headerLines = doc.splitTextToSize(headerText, pageWidth - margin * 2);
+                        headerLines.forEach(line => {
+                            doc.text(line, margin + 5, yPos);
+                            yPos += lineHeight;
+                        });
+                        
+                        solutions[index].forEach(solution => {
+                            if (yPos > 270) {
+                                doc.addPage();
+                                yPos = 30;
+                            }
+                            const solutionText = `- ${solution}`;
+                            const solutionLines = doc.splitTextToSize(solutionText, pageWidth - margin * 3);
+                            solutionLines.forEach(line => {
+                                doc.text(line, margin + 10, yPos);
+                                yPos += lineHeight;
+                            });
+                        });
+                        yPos += 5;
+                    }
+                });
+                
+                // Footer
+                if (yPos > 250) {
+                    doc.addPage();
+                    yPos = 30;
+                }
+                yPos = 280;
+                doc.setFontSize(8);
+                doc.text('Generated by AI Workflow Detective - Project Evident', margin, yPos);
+                
+                doc.save(`AI-Workflow-Plan-${workflowTitle.replace(/\s+/g, '-')}.pdf`);
+                showNotification('Simple PDF downloaded successfully!', 'success');
+                updatePoints(8, 'Downloaded simple PDF');
+                
             } catch (error) {
-                console.error('Clean PDF error:', error);
-                showNotification('Clean PDF not available. Try Screenshot PDF.', 'error');
+                console.error('Simple PDF error:', error);
+                showNotification('PDF generation failed. Try Print Version instead.', 'error');
             }
         }
 
@@ -2167,10 +2237,37 @@
             }
         }
 
-        // Print-friendly version
+        // Print-friendly version - most reliable option
         function printFriendly() {
             const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
-            const pdfContent = createPDFContent();
+            
+            let calcPoints = painPoints.length * 5 + Object.values(solutions).flat().length * 10 + 10;
+            let scoreMessage = '';
+            if (calcPoints >= 100) {
+                scoreMessage = "Master Detective! You've uncovered amazing AI opportunities!";
+            } else if (calcPoints >= 70) {
+                scoreMessage = "Expert Detective! Great job identifying key improvements!";
+            } else if (calcPoints >= 40) {
+                scoreMessage = "Good Detective Work! You're on the right track!";
+            } else {
+                scoreMessage = "Novice Detective - Keep exploring more opportunities!";
+            }
+            
+            let painPointsHTML = '';
+            painPoints.forEach((point, index) => {
+                painPointsHTML += `
+                    <div style="margin-bottom: 20px; padding: 15px; border-left: 3px solid #333;">
+                        <h4>Pain Point ${index + 1}:</h4>
+                        <p>${point}</p>
+                        ${solutions[index] && solutions[index].length > 0 ? `
+                            <p><strong>AI Solutions:</strong></p>
+                            <ul>
+                                ${solutions[index].map(solution => `<li>${solution}</li>`).join('')}
+                            </ul>
+                        ` : ''}
+                    </div>
+                `;
+            });
             
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
@@ -2179,22 +2276,91 @@
                 <head>
                     <title>AI Workflow Plan - ${workflowTitle}</title>
                     <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
-                        .pdf-content { max-width: 800px; margin: 0 auto; }
-                        .pdf-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #1c487b; padding-bottom: 15px; }
-                        .pdf-header h1 { color: #1c487b; margin-bottom: 10px; }
-                        .pdf-header h2 { color: #f18f38; font-weight: normal; }
-                        .pdf-section { margin-bottom: 25px; page-break-inside: avoid; }
-                        .pdf-section h3 { color: #1c487b; border-left: 4px solid #1ab1d2; padding-left: 12px; }
-                        .pdf-pain-point { background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 5px solid #f18f38; }
-                        .pdf-pain-point h4 { color: #f18f38; margin-bottom: 10px; }
-                        .pdf-solution { margin: 8px 0 8px 20px; }
-                        .pdf-solution::before { content: "• "; color: #1ab1d2; font-weight: bold; }
-                        .pdf-footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #1c487b; text-align: center; color: #666; font-size: 12px; }
-                        @media print { body { margin: 0; } }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 40px; 
+                            line-height: 1.6; 
+                            color: #333;
+                        }
+                        h1 { 
+                            text-align: center; 
+                            color: #1c487b; 
+                            border-bottom: 2px solid #1c487b; 
+                            padding-bottom: 10px; 
+                        }
+                        h2 { 
+                            color: #f18f38; 
+                            margin-top: 30px; 
+                        }
+                        h3 { 
+                            color: #1c487b; 
+                            margin-top: 25px; 
+                        }
+                        h4 { 
+                            color: #1c487b; 
+                            margin-bottom: 8px; 
+                        }
+                        .score { 
+                            text-align: center; 
+                            background: #f8f9fa; 
+                            padding: 15px; 
+                            margin: 20px 0; 
+                            border-radius: 5px; 
+                        }
+                        ul { 
+                            margin: 10px 0; 
+                            padding-left: 20px; 
+                        }
+                        li { 
+                            margin-bottom: 5px; 
+                        }
+                        .footer { 
+                            margin-top: 40px; 
+                            padding-top: 20px; 
+                            border-top: 1px solid #ccc; 
+                            text-align: center; 
+                            color: #666; 
+                            font-size: 12px; 
+                        }
+                        @media print { 
+                            body { margin: 20px; } 
+                            .no-print { display: none; }
+                        }
                     </style>
                 </head>
-                <body>${pdfContent.innerHTML}</body>
+                <body>
+                    <h1>AI Workflow Enhancement Plan</h1>
+                    
+                    <div class="score">
+                        <p><strong>Mission Complete!</strong></p>
+                        <p>Final Score: ${calcPoints} Points!</p>
+                        <p>${scoreMessage}</p>
+                    </div>
+                    
+                    <h2>Selected Workflow</h2>
+                    <p><strong>${workflowTitle}</strong></p>
+                    
+                    <h2>Pain Points Identified (${painPoints.length})</h2>
+                    ${painPointsHTML}
+                    
+                    <h2>Next Steps</h2>
+                    <ul>
+                        <li>Start with the simplest AI solution first</li>
+                        <li>Test with a small pilot project</li>
+                        <li>Measure time saved and impact</li>
+                        <li>Expand successful solutions to other areas</li>
+                        <li>Celebrate small wins - every minute saved is a victory!</li>
+                    </ul>
+                    
+                    <div class="footer">
+                        <p>Generated by AI Workflow Detective - COMPAS Edition | Project Evident</p>
+                        <p>For more resources, visit your organization's AI learning materials</p>
+                    </div>
+                    
+                    <div class="no-print" style="margin-top: 30px; text-align: center; background: #e8f6f8; padding: 15px; border-radius: 5px;">
+                        <p><strong>To save as PDF:</strong> Use your browser's Print function and select "Save as PDF" as the destination.</p>
+                    </div>
+                </body>
                 </html>
             `);
             
