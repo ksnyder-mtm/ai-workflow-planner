@@ -2163,46 +2163,56 @@
                         <h4>Pain Point ${index + 1}:</h4>
                         <p>${pointText}</p>
                         ${solutions[index] && solutions[index].length > 0 ? `
-                            <p><strong>How you'll use AI:</strong></p>
-                            <ul style="margin-top: 5px;">
-                                ${solutions[index].map(solution => {
-                                    // Handle both superpower cards and custom typed solutions
-                                    let solutionText = '';
-                                    let solutionType = 'unknown';
+                            <div style="margin-top: 10px;">
+                                ${(() => {
+                                    // Separate superpowers from user-typed solutions
+                                    let superpowers = [];
+                                    let userPlans = [];
                                     
-                                    if (typeof solution === 'string') {
-                                        solutionText = solution;
-                                        // Check if it's an AI superpower (emoji + word + colon + description)
-                                        if (solution.match(/^[📝✍️📊🗂️🌐💡]\s*(Summarizing|Drafting|Analyzing|Organizing|Translating|Brainstorming):/)) {
-                                            solutionType = 'superpower';
+                                    solutions[index].forEach(solution => {
+                                        let solutionText = '';
+                                        let solutionType = 'unknown';
+                                        
+                                        if (typeof solution === 'string') {
+                                            solutionText = solution;
+                                            // Check if it's an AI superpower (emoji + word + colon + description)
+                                            if (solution.match(/^[📝✍️📊🗂️🌐💡]\s*(Summarizing|Drafting|Analyzing|Organizing|Translating|Brainstorming):/)) {
+                                                superpowers.push(solutionText);
+                                            } else {
+                                                userPlans.push(solutionText);
+                                            }
+                                        } else if (solution && solution.text) {
+                                            userPlans.push(solution.text);
+                                        } else if (solution && solution.description) {
+                                            userPlans.push(solution.description);
                                         } else {
-                                            solutionType = 'user-typed';
+                                            userPlans.push('AI solution');
                                         }
-                                    } else if (solution && solution.text) {
-                                        solutionText = solution.text;
-                                        solutionType = 'user-typed';
-                                    } else if (solution && solution.description) {
-                                        solutionText = solution.description;
-                                        solutionType = 'user-typed';
-                                    } else {
-                                        solutionText = 'AI solution';
-                                        solutionType = 'unknown';
+                                    });
+                                    
+                                    let html = '';
+                                    
+                                    if (superpowers.length > 0) {
+                                        html += '<p><strong>🤖 AI Superpowers you\'ll use:</strong></p>';
+                                        html += '<ul style="margin-top: 5px; margin-bottom: 15px;">';
+                                        superpowers.forEach(power => {
+                                            html += `<li style="margin-bottom: 5px; background: #fff3e0; padding: 10px; border-radius: 6px; border-left: 4px solid #ff9800; border: 1px solid #ffcc80;">${power}</li>`;
+                                        });
+                                        html += '</ul>';
                                     }
                                     
-                                    let style = 'margin-bottom: 3px;';
-                                    let label = '';
-                                    
-                                    if (solutionType === 'superpower') {
-                                        style = 'margin-bottom: 3px; background: #fff3e0; padding: 8px; border-radius: 4px; border-left: 3px solid #ff9800;';
-                                        label = '<strong>AI Capability:</strong> ';
-                                    } else if (solutionType === 'user-typed') {
-                                        style = 'margin-bottom: 3px; background: #e8f6f8; padding: 8px; border-radius: 4px; border-left: 3px solid #1ab1d2; font-style: italic;';
-                                        label = '<strong>Your specific plan:</strong> ';
+                                    if (userPlans.length > 0) {
+                                        html += '<p><strong>💭 Your Specific Implementation Plan:</strong></p>';
+                                        html += '<ul style="margin-top: 5px;">';
+                                        userPlans.forEach(plan => {
+                                            html += `<li style="margin-bottom: 5px; background: #e8f6f8; padding: 10px; border-radius: 6px; border-left: 4px solid #1ab1d2; font-style: italic; border: 1px solid #b3e5fc;">${plan}</li>`;
+                                        });
+                                        html += '</ul>';
                                     }
                                     
-                                    return `<li style="${style}">${label}${solutionText}</li>`;
-                                }).join('')}
-                            </ul>
+                                    return html;
+                                })()}
+                            </div>
                             ${existingTools[index] || neededTools[index] ? `
                                 <div style="margin-top: 10px; padding: 10px; background: #f0f8ff; border-radius: 5px;">
                                     <p style="font-weight: bold; color: #1c487b; margin-bottom: 5px;">🛠️ Your Resource Plan:</p>

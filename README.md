@@ -2,7 +2,7 @@
 
 An interactive gamified learning experience that helps nonprofit organizations identify AI augmentation opportunities using the COMPAS framework.
 
-![Project Logo](https://img.shields.io/badge/Project-Evident-blue)
+![Project Logo](https://img.shields.io/badge/Meet%20the%20Moment-blue)
 ![Framework](https://img.shields.io/badge/Framework-COMPAS-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
