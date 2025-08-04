@@ -1282,16 +1282,13 @@
                     </div>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                            <button class="download-btn" onclick="printFriendly()" style="background: #f18f38; font-size: 1.1rem;">
-                                🖨️ Print to PDF (Recommended)
-                            </button>
-                            <button class="download-btn" onclick="generateScreenshotPDF()" style="background: #1ab1d2;">
-                                📸 Screenshot PDF
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <button class="download-btn" onclick="printFriendly()" style="background: #f18f38; font-size: 1.2rem; padding: 18px 35px;">
+                                🖨️ Download Your Plan as PDF
                             </button>
                         </div>
                         <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 15px;">
-                            💡 Tip: "Print to PDF" opens a new window where you can use your browser's print function and select "Save as PDF"
+                            💡 This opens a print-friendly window where you can save as PDF using your browser
                         </p>
                         <button class="reset-btn" onclick="resetGame()">🔄 Start Over</button>
                     </div>
@@ -1600,24 +1597,25 @@
                     </div>
                     
                     <div id="toolsSection${currentPainPointIndex}" style="display: none; margin-top: 20px; padding: 15px; background: #e8f6f8; border-radius: 10px; border-left: 5px solid #f18f38;">
-                        <h4 style="color: #1c487b; margin-bottom: 15px;">🛠️ Tools & Resources Needed</h4>
+                        <h4 style="color: #1c487b; margin-bottom: 10px;">🛠️ Tools & Resources</h4>
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 15px; font-style: italic;">💡 Focus on using what you already have first!</p>
                         
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #1c487b;">Tools you already have:</label>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #1c487b;">✅ Tools you can use right now:</label>
                             <textarea id="existingTools${currentPainPointIndex}" 
-                                      placeholder="List tools, software, or resources your organization already has (e.g., Microsoft Office, Google Workspace, Slack, specific databases...)"
-                                      style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; min-height: 60px; resize: vertical;"></textarea>
+                                      placeholder="What do you already have that could help? (Microsoft Office, Google Workspace, Slack, Teams, email, existing databases, spreadsheets, your team's knowledge...)"
+                                      style="width: 100%; padding: 10px; border: 2px solid #1c487b; border-radius: 8px; min-height: 70px; resize: vertical;"></textarea>
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #f18f38;">Tools you'll need to obtain:</label>
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #f18f38;">⚠️ Additional tools (only if needed):</label>
                             <textarea id="neededTools${currentPainPointIndex}" 
-                                      placeholder="List tools, subscriptions, or resources you'll need to get (e.g., ChatGPT Plus, Zapier, specific AI tools, training...)"
-                                      style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; min-height: 60px; resize: vertical;"></textarea>
+                                      placeholder="Only list if absolutely necessary... (e.g., specific AI tools, training, subscriptions). Remember: start with what you have!"
+                                      style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; min-height: 50px; resize: vertical;"></textarea>
                         </div>
                         
                         <button class="add-pain-btn" onclick="saveTools(${currentPainPointIndex})" style="background: #1ab1d2;">
-                            💾 Save Tools (+5 points)
+                            💾 Save Your Resource Plan (+5 points)
                         </button>
                     </div>
                 </div>
@@ -2129,168 +2127,6 @@
             }
         }
 
-        // Simple text-based PDF generation
-        function generateCleanPDF() {
-            try {
-                const { jsPDF } = window.jspdf;
-                if (!jsPDF) {
-                    showNotification('PDF library not loaded. Please try Print Version instead.', 'error');
-                    return;
-                }
-                
-                showNotification('Generating simple PDF... Please wait.', 'success');
-                
-                const doc = new jsPDF();
-                const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
-                
-                let yPos = 30;
-                const margin = 20;
-                const pageWidth = doc.internal.pageSize.width;
-                const lineHeight = 8;
-                
-                // Header
-                doc.setFontSize(18);
-                doc.setTextColor(0, 0, 0);
-                doc.text('AI Workflow Enhancement Plan', margin, yPos);
-                yPos += lineHeight * 2;
-                
-                // Workflow
-                doc.setFontSize(14);
-                doc.text('Workflow: ' + workflowTitle, margin, yPos);
-                yPos += lineHeight * 2;
-                
-                // Pain Points
-                doc.setFontSize(12);
-                doc.text('PAIN POINTS IDENTIFIED:', margin, yPos);
-                yPos += lineHeight;
-                
-                doc.setFontSize(10);
-                painPoints.forEach((point, index) => {
-                    if (yPos > 270) {
-                        doc.addPage();
-                        yPos = 30;
-                    }
-                    const text = `${index + 1}. ${point}`;
-                    const lines = doc.splitTextToSize(text, pageWidth - margin * 2);
-                    lines.forEach(line => {
-                        doc.text(line, margin + 5, yPos);
-                        yPos += lineHeight;
-                    });
-                    yPos += 3;
-                });
-                
-                yPos += lineHeight;
-                
-                // Solutions
-                doc.setFontSize(12);
-                doc.text('AI SOLUTIONS:', margin, yPos);
-                yPos += lineHeight;
-                
-                doc.setFontSize(10);
-                painPoints.forEach((point, index) => {
-                    if (solutions[index] && solutions[index].length > 0) {
-                        if (yPos > 250) {
-                            doc.addPage();
-                            yPos = 30;
-                        }
-                        
-                        const headerText = `For: ${point}`;
-                        const headerLines = doc.splitTextToSize(headerText, pageWidth - margin * 2);
-                        headerLines.forEach(line => {
-                            doc.text(line, margin + 5, yPos);
-                            yPos += lineHeight;
-                        });
-                        
-                        solutions[index].forEach(solution => {
-                            if (yPos > 270) {
-                                doc.addPage();
-                                yPos = 30;
-                            }
-                            const solutionText = `- ${solution}`;
-                            const solutionLines = doc.splitTextToSize(solutionText, pageWidth - margin * 3);
-                            solutionLines.forEach(line => {
-                                doc.text(line, margin + 10, yPos);
-                                yPos += lineHeight;
-                            });
-                        });
-                        yPos += 5;
-                    }
-                });
-                
-                // Footer
-                if (yPos > 250) {
-                    doc.addPage();
-                    yPos = 30;
-                }
-                yPos = 280;
-                doc.setFontSize(8);
-                doc.text('Generated by AI Workflow Detective - Meet the Moment', margin, yPos);
-                
-                doc.save(`AI-Workflow-Plan-${workflowTitle.replace(/\s+/g, '-')}.pdf`);
-                showNotification('Simple PDF downloaded successfully!', 'success');
-                updatePoints(8, 'Downloaded simple PDF');
-                
-            } catch (error) {
-                console.error('Simple PDF error:', error);
-                showNotification('PDF generation failed. Try Print Version instead.', 'error');
-            }
-        }
-
-        // Screenshot PDF using html2canvas + jsPDF
-        function generateScreenshotPDF() {
-            try {
-                showNotification('Taking screenshot for PDF... Please wait.', 'success');
-                
-                const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
-                const resultsElement = document.getElementById('results');
-                
-                html2canvas(resultsElement, {
-                    scale: 3,
-                    useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: '#ffffff',
-                    removeContainer: true,
-                    logging: false,
-                    width: resultsElement.scrollWidth,
-                    height: resultsElement.scrollHeight,
-                    scrollX: 0,
-                    scrollY: 0,
-                    foreignObjectRendering: true,
-                    imageTimeout: 15000
-                }).then(canvas => {
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    
-                    const imgWidth = 190;
-                    const pageHeight = 277;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 10;
-                    
-                    const imgData = canvas.toDataURL('image/png');
-                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                    
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
-                    
-                    pdf.save(`AI-Workflow-Plan-Screenshot-${workflowTitle.replace(/\s+/g, '-')}.pdf`);
-                    showNotification('Screenshot PDF downloaded successfully!', 'success');
-                    updatePoints(8, 'Downloaded screenshot PDF');
-                }).catch(error => {
-                    console.error('Screenshot PDF error:', error);
-                    showNotification('Screenshot failed. Try Print Version instead.', 'error');
-                });
-                
-            } catch (error) {
-                console.error('Screenshot PDF error:', error);
-                showNotification('Screenshot not available. Try Print Version.', 'error');
-            }
-        }
 
         // Print-friendly version - most reliable option
         function printFriendly() {
@@ -2332,26 +2168,37 @@
                                 ${solutions[index].map(solution => {
                                     // Handle both superpower cards and custom typed solutions
                                     let solutionText = '';
+                                    let isUserTyped = false;
+                                    
                                     if (typeof solution === 'string') {
                                         solutionText = solution;
+                                        // Check if it's a generic superpower (contains emoji and colon)
+                                        isUserTyped = !solution.match(/^[📝🗂🔍💡🎯🔄]+\s*\w+:/);
                                     } else if (solution && solution.text) {
                                         solutionText = solution.text;
+                                        isUserTyped = true;
                                     } else if (solution && solution.description) {
                                         solutionText = solution.description;
+                                        isUserTyped = true;
                                     } else {
                                         solutionText = 'AI solution';
                                     }
-                                    return `<li style="margin-bottom: 3px;">${solutionText}</li>`;
+                                    
+                                    const style = isUserTyped ? 
+                                        'margin-bottom: 3px; background: #e8f6f8; padding: 8px; border-radius: 4px; border-left: 3px solid #1ab1d2; font-style: italic;' : 
+                                        'margin-bottom: 3px;';
+                                    
+                                    return `<li style="${style}">${isUserTyped ? '<strong>Your specific plan:</strong> ' : ''}${solutionText}</li>`;
                                 }).join('')}
                             </ul>
                             ${existingTools[index] || neededTools[index] ? `
                                 <div style="margin-top: 10px; padding: 10px; background: #f0f8ff; border-radius: 5px;">
-                                    <p style="font-weight: bold; color: #1c487b; margin-bottom: 5px;">🛠️ Tools & Resources:</p>
+                                    <p style="font-weight: bold; color: #1c487b; margin-bottom: 5px;">🛠️ Your Resource Plan:</p>
                                     ${existingTools[index] ? `
-                                        <p><strong>Tools you have:</strong><br>${existingTools[index]}</p>
+                                        <p style="background: #e8f6e8; padding: 8px; border-radius: 4px; border-left: 3px solid #28a745;"><strong>✅ Tools you can use right now:</strong><br><em>${existingTools[index]}</em></p>
                                     ` : ''}
                                     ${neededTools[index] ? `
-                                        <p><strong>Tools you'll need:</strong><br>${neededTools[index]}</p>
+                                        <p style="background: #fff3cd; padding: 8px; border-radius: 4px; border-left: 3px solid #ffc107; margin-top: 5px;"><strong>⚠️ Additional tools (if needed):</strong><br><em>${neededTools[index]}</em></p>
                                     ` : ''}
                                 </div>
                             ` : ''}
@@ -2441,26 +2288,6 @@
                     <h2>Pain Points Identified (${painPoints.length})</h2>
                     ${painPointsHTML}
                     
-                    ${Object.values(solutions).some(arr => arr.length > 0) ? `
-                        <h2>Your Implementation Plan</h2>
-                        <p><strong>Ready to get started?</strong> You've identified specific ways AI can help your workflow. Here's how to move forward:</p>
-                        <ul>
-                            <li><strong>Start small:</strong> Pick one pain point and implement one AI solution first</li>
-                            <li><strong>Gather your tools:</strong> Make sure you have the resources identified above</li>
-                            <li><strong>Test and measure:</strong> Try your AI solution for a week and track time saved</li>
-                            <li><strong>Expand gradually:</strong> Once successful, apply similar solutions to other pain points</li>
-                            <li><strong>Share your success:</strong> Tell your team what worked so they can benefit too</li>
-                        </ul>
-                    ` : `
-                        <h2>Next Steps</h2>
-                        <ul>
-                            <li>Start with the simplest AI solution first</li>
-                            <li>Test with a small pilot project</li>
-                            <li>Measure time saved and impact</li>
-                            <li>Expand successful solutions to other areas</li>
-                            <li>Celebrate small wins - every minute saved is a victory!</li>
-                        </ul>
-                    `}
                     
                     <div class="footer">
                         <p>Generated by AI Workflow Detective - COMPAS Edition | Meet the Moment</p>
@@ -2484,113 +2311,6 @@
             }, 500);
         }
 
-        // Create clean PDF content
-        function createPDFContent() {
-            const workflowTitle = selectedWorkflow === 'custom' ? customWorkflow : workflowExamples[selectedWorkflow].title;
-            
-            const pdfDiv = document.createElement('div');
-            pdfDiv.className = 'pdf-content';
-            
-            let calcPoints = painPoints.length * 5 + Object.values(solutions).flat().length * 10 + 10;
-            let scoreMessage = '';
-            if (calcPoints >= 100) {
-                scoreMessage = "Master Detective! You've uncovered amazing AI opportunities!";
-            } else if (calcPoints >= 70) {
-                scoreMessage = "Expert Detective! Great job identifying key improvements!";
-            } else if (calcPoints >= 40) {
-                scoreMessage = "Good Detective Work! You're on the right track!";
-            } else {
-                scoreMessage = "Novice Detective - Keep exploring more opportunities!";
-            }
-            
-            pdfDiv.innerHTML = `
-                <div class="pdf-header">
-                    <h1>Mission Complete!</h1>
-                    <h2>AI Workflow Detective - COMPAS Edition</h2>
-                    <p>You've successfully mapped your AI enhancement journey!</p>
-                    <p><strong>Final Score: ${calcPoints} Points!</strong></p>
-                    <p>${scoreMessage}</p>
-                </div>
-                
-                <div class="pdf-section">
-                    <h3>Your AI-Augmented Workflow Plan</h3>
-                    <p><strong>Selected Workflow:</strong> ${workflowTitle}</p>
-                </div>
-                
-                <div class="pdf-section">
-                    <h3>Pain Points Identified (${painPoints.length})</h3>
-                    ${painPoints.map((point, index) => {
-                        // Handle different pain point formats 
-                        let pointText = '';
-                        if (typeof point === 'string') {
-                            pointText = point;
-                        } else if (point && point.text) {
-                            pointText = point.text;
-                        } else if (point && point.description) {
-                            pointText = point.description;
-                        } else {
-                            pointText = 'Unknown pain point';
-                        }
-                        
-                        return `
-                            <div class="pdf-pain-point">
-                                <h4>Pain Point ${index + 1}</h4>
-                                <p>${pointText}</p>
-                                ${solutions[index] && solutions[index].length > 0 ? `
-                                    <p><strong>How you'll use AI:</strong></p>
-                                    ${solutions[index].map(solution => {
-                                        let solutionText = '';
-                                        if (typeof solution === 'string') {
-                                            solutionText = solution;
-                                        } else if (solution && solution.text) {
-                                            solutionText = solution.text;
-                                        } else if (solution && solution.description) {
-                                            solutionText = solution.description;
-                                        } else {
-                                            solutionText = 'AI solution';
-                                        }
-                                        return `<div class="pdf-solution">${solutionText}</div>`;
-                                    }).join('')}
-                                    ${existingTools[index] || neededTools[index] ? `
-                                        <div style="margin-top: 10px; padding: 8px; background: #f0f8ff; border-radius: 3px;">
-                                            <p style="font-weight: bold; margin-bottom: 5px;"><strong>🛠️ Tools & Resources:</strong></p>
-                                            ${existingTools[index] ? `<p><strong>Tools you have:</strong> ${existingTools[index]}</p>` : ''}
-                                            ${neededTools[index] ? `<p><strong>Tools you'll need:</strong> ${neededTools[index]}</p>` : ''}
-                                        </div>
-                                    ` : ''}
-                                ` : ''}
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                
-                <div class="pdf-section">
-                    ${Object.values(solutions).some(arr => arr.length > 0) ? `
-                        <h3>Your Implementation Plan</h3>
-                        <p><strong>Ready to get started?</strong> You've identified specific ways AI can help your workflow. Here's how to move forward:</p>
-                        <div class="pdf-solution">Start small: Pick one pain point and implement one AI solution first</div>
-                        <div class="pdf-solution">Gather your tools: Make sure you have the resources identified above</div>
-                        <div class="pdf-solution">Test and measure: Try your AI solution for a week and track time saved</div>
-                        <div class="pdf-solution">Expand gradually: Once successful, apply similar solutions to other pain points</div>
-                        <div class="pdf-solution">Share your success: Tell your team what worked so they can benefit too</div>
-                    ` : `
-                        <h3>Next Steps</h3>
-                        <div class="pdf-solution">Start with the simplest AI solution first</div>
-                        <div class="pdf-solution">Test with a small pilot project</div>
-                        <div class="pdf-solution">Measure time saved and impact</div>
-                        <div class="pdf-solution">Expand successful solutions to other areas</div>
-                        <div class="pdf-solution">Celebrate small wins - every minute saved is a victory!</div>
-                    `}
-                </div>
-                
-                <div class="pdf-footer">
-                    <p>Generated by AI Workflow Detective - COMPAS Edition | Meet the Moment</p>
-                    <p>For more resources, visit your organization's AI learning materials</p>
-                </div>
-            `;
-            
-            return pdfDiv;
-        }
 
         function resetGame() {
             if (confirm('Are you sure you want to start over? Your current progress will be lost.')) {
