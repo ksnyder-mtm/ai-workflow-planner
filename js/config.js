@@ -28,25 +28,25 @@ const AppConfig = {
     badges: {
         workflow: {
             id: 'badge-workflow',
-            icon: '🗺️',
+            icon: 'W',
             title: 'Workflow Explorer',
             description: 'Selected a workflow to analyze'
         },
         pain: {
             id: 'badge-pain',
-            icon: '🔍',
+            icon: 'P',
             title: 'Pain Point Detective',
             description: 'Identified 3+ pain points'
         },
         solution: {
             id: 'badge-solution',
-            icon: '💡',
+            icon: 'S',
             title: 'Solution Designer',
             description: 'Created 3+ AI solutions'
         },
         complete: {
             id: 'badge-complete',
-            icon: '🏆',
+            icon: 'M',
             title: 'Master Detective',
             description: 'Completed the full workflow analysis'
         }
@@ -82,19 +82,19 @@ const AppConfig = {
         // Progress messages by level
         progressMessages: {
             0: "Ready to begin your detective journey!",
-            1: "🧭 Context identified - great start!",
-            2: "🔍 Pain points discovered - you're on the trail!",
-            3: "🎯 Solutions designed - almost there!",
-            4: "🎉 Mission complete - you did it!"
+            1: "Context identified - great start!",
+            2: "Pain points discovered - you're on the trail!",
+            3: "Solutions designed - almost there!",
+            4: "Mission complete - you did it!"
         },
 
         // Score messages based on final points
         scoreMessages: {
-            200: "🌟 AI Detective Master! You've uncovered game-changing opportunities!",
-            150: "🎯 Expert Detective! Your workflow transformation plan is solid!",
-            100: "💪 Great Detective Work! You've identified key improvements!",
-            50: "👍 Good Start! You've begun your AI enhancement journey!",
-            0: "✨ Journey Started! Every step counts towards improvement!"
+            200: "AI Detective Master! You've uncovered game-changing opportunities!",
+            150: "Expert Detective! Your workflow transformation plan is solid!",
+            100: "Great Detective Work! You've identified key improvements!",
+            50: "Good Start! You've begun your AI enhancement journey!",
+            0: "Journey Started! Every step counts towards improvement!"
         }
     },
 

@@ -6,9 +6,9 @@
 class WorkflowTemplates {
     constructor() {
         this.compasSteps = [
-            { id: 'context', name: '🧭 Context', description: 'Choose workflow' },
-            { id: 'objective', name: '🎯 Objective', description: 'Identify pain & solutions' },
-            { id: 'method', name: '🛠️ Method', description: 'Plan implementation' }
+            { id: 'context', name: 'Context', description: 'Choose workflow' },
+            { id: 'objective', name: 'Objective', description: 'Identify pain & solutions' },
+            { id: 'method', name: 'Method', description: 'Plan implementation' }
         ];
     }
 
@@ -18,7 +18,6 @@ class WorkflowTemplates {
     getMainLayout() {
         return `
             <div class="container">
-                ${this.getCompasIndicator()}
                 ${this.getGamificationBar()}
                 ${this.getProgressSection()}
                 <div class="game-area">
@@ -31,18 +30,10 @@ class WorkflowTemplates {
 
     /**
      * Get COMPAS framework indicator
+     * Note: Removed from UI to reduce clutter and avoid blocking content
      */
     getCompasIndicator() {
-        return `
-            <div class="compas-indicator">
-                <h4 style="margin-bottom: 10px; color: #1c487b;">COMPAS Progress</h4>
-                ${this.compasSteps.map(step => `
-                    <div class="compas-step" id="compas-${step.id}">
-                        <span>${step.name}</span>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+        return '';
     }
 
     /**
@@ -51,19 +42,14 @@ class WorkflowTemplates {
     getGamificationBar() {
         return `
             <div class="gamification-bar">
-                <div class="detective-title">
-                    <span class="detective-icon">🕵️</span>
-                    <span>AI Workflow Detective</span>
+                <div class="explorer-title">
+                    <span class="explorer-icon">AI</span>
+                    <span>AI Workflow Explorer</span>
                 </div>
-                <div class="points-display">
-                    <span>Points:</span>
-                    <span class="points-value" id="pointsDisplay">0</span>
-                </div>
+                <!-- Points system removed to focus on workflow process -->
                 <div class="badges-container">
-                    <div class="badge" id="badge-workflow" title="Workflow Explorer">🗺️</div>
-                    <div class="badge" id="badge-pain" title="Pain Point Detective">🔍</div>
-                    <div class="badge" id="badge-solution" title="Solution Designer">💡</div>
-                    <div class="badge" id="badge-complete" title="Master Detective">🏆</div>
+                    <div class="badge" id="badge-detective" title="AI Explorer">🤖</div>
+                    <div class="badge" id="badge-investigator" title="Workflow Explorer">🔍</div>
                 </div>
             </div>
         `;
@@ -78,7 +64,7 @@ class WorkflowTemplates {
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <div class="progress-text" id="progressText">Ready to begin your detective journey!</div>
+                <div class="progress-text" id="progressText">🗺️ Ready to Begin Your AI Explorer Journey!</div>
             </div>
         `;
     }
@@ -103,10 +89,10 @@ class WorkflowTemplates {
         return `
             <div class="navigation" id="navigation">
                 <button class="nav-btn" id="prevBtn">
-                    ⬅️ Previous
+                    Previous
                 </button>
                 <button class="nav-btn" id="nextBtn">
-                    Next Step ➡️
+                    Next Step
                 </button>
             </div>
         `;
@@ -119,7 +105,7 @@ class WorkflowTemplates {
         return `
             <div class="level-header">
                 <div class="level-title">
-                    🗺️ Your AI Enhancement Journey
+                    Your AI Enhancement Journey
                 </div>
                 <div class="level-description">
                     Welcome, AI Detective! You're about to discover how AI can make your nonprofit work more impactful - not by replacing what you do, but by handling the tedious stuff so you can focus on what matters most.
@@ -130,60 +116,57 @@ class WorkflowTemplates {
             <div class="mobile-compas">
                 <h4>You'll explore the COMPAS framework:</h4>
                 <div class="compas-badges">
-                    <span class="compas-badge context">🧭 Context</span>
-                    <span class="compas-badge objective">🎯 Objective</span>
+                    <span class="compas-badge context">Context</span>
+                    <span class="compas-badge objective">Objective</span>
                 </div>
             </div>
 
             <div class="overview-cards">
                 <div class="overview-card play">
-                    <h3>🎮 How to Play</h3>
+                    <h3>How to Play</h3>
                     <p>Earn points and badges as you identify workflows, discover pain points, and design AI solutions. Each choice you make builds your personalized AI enhancement plan!</p>
                 </div>
                 
                 <div class="overview-card time">
-                    <h3>⏱️ Time Investment</h3>
+                    <h3>Time Investment</h3>
                     <p>About 10-15 minutes to complete. You'll walk away with a concrete plan you can actually use - no fluff, just practical next steps.</p>
                 </div>
                 
                 <div class="overview-card remember">
-                    <h3>🤝 Remember This</h3>
+                    <h3>Remember This</h3>
                     <p>AI augmentation = AI does the boring stuff, you do the brilliant stuff. It's about partnership, not replacement!</p>
                 </div>
             </div>
 
             <div class="mission-box">
-                <h3>🎯 Your Mission (Should You Choose to Accept It)</h3>
+                <h3>Your Mission</h3>
                 <div class="mission-steps">
                     <div class="mission-step">
                         <div class="step-number">1</div>
                         <h4>Context</h4>
                         <p>Choose a workflow that needs help</p>
-                        <span class="points-indicator">+10 points</span>
-                    </div>
+                                            </div>
                     <div class="mission-step">
                         <div class="step-number">2</div>
-                        <h4>Find Clues</h4>
+                        <h4>Find Opportunities</h4>
                         <p>Identify what's slowing you down</p>
-                        <span class="points-indicator">+5 points each</span>
-                    </div>
+                                            </div>
                     <div class="mission-step">
                         <div class="step-number">3</div>
                         <h4>Objective</h4>
                         <p>Design AI-powered solutions</p>
-                        <span class="points-indicator">+10 points each</span>
-                    </div>
+                                            </div>
                 </div>
             </div>
 
             <div class="hint-box">
-                <h4>💡 Pro Tip</h4>
+                <h4>Pro Tip</h4>
                 <p>Think of a task you did this week that made you think "there has to be a better way!" That's your perfect starting point.</p>
             </div>
 
             <div class="start-section">
                 <button class="nav-btn start-detective-btn">
-                    🕵️ Start Your Detective Work!
+                    Start Your AI Workflow Journey
                 </button>
             </div>
         `;
@@ -196,7 +179,7 @@ class WorkflowTemplates {
         return `
             <div class="level-header">
                 <div class="level-title">
-                    🧭 Mission 1: Context - Choose Your Workflow Challenge
+                    Mission 1: Context - Choose Your Workflow Challenge
                 </div>
                 <div class="level-description">
                     Every nonprofit has workflows that eat up precious time. Which one frustrates you the most? Select one below or create your own.
@@ -204,9 +187,9 @@ class WorkflowTemplates {
                 <button class="help-button" onclick="showHelp('workflow')">?</button>
             </div>
 
-            <div class="hint-box">
-                <h4>💭 Need inspiration? Click any example below:</h4>
-                <div class="examples">
+            <div class="hint-box" id="inspirationBox">
+                <h4>Need inspiration? Click any example below:</h4>
+                <div class="examples" id="workflowExamples">
                     <div class="example-item" data-example="meetings">• "Our weekly team meetings feel like Groundhog Day"</div>
                     <div class="example-item" data-example="communication">• "I write the same donor thank-you email 50 times a month"</div>
                     <div class="example-item" data-example="data">• "Survey responses sit in a spreadsheet graveyard"</div>
@@ -216,8 +199,7 @@ class WorkflowTemplates {
             <div class="workflow-cards" id="workflowCards">
                 ${workflows.map(workflow => `
                     <div class="workflow-card" data-workflow="${workflow.id}">
-                        <span class="card-points">+${workflow.points}</span>
-                        <h3>${workflow.icon} ${workflow.title}</h3>
+                                                <h3>${workflow.icon} ${workflow.title}</h3>
                         <p>${workflow.description}</p>
                     </div>
                 `).join('')}
@@ -242,7 +224,7 @@ class WorkflowTemplates {
         return `
             <div class="level-header">
                 <div class="level-title">
-                    🔍 Mission 2: Detective Work - Find the Pain Points
+                    Mission 2: Explorer Work - Find the Pain Points
                 </div>
                 <div class="level-description">
                     <span id="workflowContext">Great work selecting ${workflowTitle}!</span> 
@@ -253,7 +235,7 @@ class WorkflowTemplates {
             </div>
 
             <div class="hint-box">
-                <h4>🕵️ Detective Clues to Look For:</h4>
+                <h4>Explorer Clues to Look For:</h4>
                 <p>Tasks that are: repetitive • time-consuming • error-prone • involve manual copying • require waiting • feel unnecessarily complex</p>
                 ${examples.length > 0 ? `
                     <div class="examples" id="painExamples">
@@ -264,23 +246,22 @@ class WorkflowTemplates {
             </div>
 
             <div class="pain-points-section">
-                <h3>🎯 What specific tasks waste your time?</h3>
+                <h3>What specific tasks waste your time?</h3>
                 <div class="pain-point-input">
                     <input type="text" id="painPointInput" 
                            placeholder="Describe a specific pain point or time waster...">
-                    <button class="add-pain-btn">➕ Add</button>
+                    <button class="add-pain-btn">Add</button>
                 </div>
                 <div class="points-info">
-                    Each pain point = <span class="points-highlight">+5 points</span> | 
-                    Select one to focus on = <span class="points-highlight">+10 bonus points</span>
+                    Add all the pain points you can think of, then select one to focus on
                 </div>
                 <div class="pain-point-list" id="painPointList"></div>
                 
                 <div id="selectedPainPointSection" class="selected-pain-section">
-                    <h4>✅ Selected Pain Point to Solve:</h4>
+                    <h4>Selected Pain Point to Solve:</h4>
                     <p id="selectedPainPointText"></p>
                     <button class="nav-btn change-selection-btn">
-                        🔄 Change Selection
+                        Change Selection
                     </button>
                 </div>
             </div>
@@ -297,9 +278,9 @@ class WorkflowTemplates {
                 <div class="pain-point-actions">
                     <button class="nav-btn select-pain-btn" 
                             data-action="select-pain" data-index="${index}">
-                        ${isSelected ? '✅ Selected' : '🎯 Select'}
+                        ${isSelected ? 'Selected' : 'Select'}
                     </button>
-                    <button class="remove-btn" data-action="remove-pain" data-index="${index}">❌</button>
+                    <button class="remove-btn" data-action="remove-pain" data-index="${index}">×</button>
                 </div>
             </div>
         `;
@@ -312,7 +293,7 @@ class WorkflowTemplates {
         return `
             <div class="level-header">
                 <div class="level-title">
-                    🎯 Mission 3: Objective - Design Your AI Solutions
+                    Mission 3: Objective - Design Your AI Solutions
                 </div>
                 <div class="level-description">
                     Time to transform pain into progress! Focus on solving your selected pain point with AI assistance. 
@@ -322,13 +303,13 @@ class WorkflowTemplates {
             </div>
 
             <div class="focused-pain-point">
-                <h3>🎯 Solving This Pain Point:</h3>
+                <h3>Solving This Pain Point:</h3>
                 <p id="focusedPainText">${focusedPain.text}</p>
                 <p class="subtitle">Now let's brainstorm AI solutions to tackle this specific challenge!</p>
             </div>
 
             <div class="hint-box">
-                <h4>🤖 AI Superpowers at Your Disposal:</h4>
+                <h4>AI Capabilities at Your Disposal:</h4>
                 <div class="ai-capabilities">
                     ${aiCapabilities.map(cap => `
                         <div class="ai-capability" draggable="true" data-capability="${cap.id}">
@@ -343,7 +324,7 @@ class WorkflowTemplates {
             <div id="solutionsContainer"></div>
             
             <div class="additional-pain-points">
-                <h4>🔄 Want to solve another pain point?</h4>
+                <h4>Want to solve another pain point?</h4>
                 <div id="remainingPainPoints"></div>
                 <p class="bonus-hint">Each additional pain point solution earns bonus points!</p>
             </div>
@@ -364,30 +345,30 @@ class WorkflowTemplates {
                               placeholder="Describe how AI could help solve this specific pain point..."
                               class="solution-textarea"></textarea>
                     <button class="add-pain-btn add-solution-btn">
-                        💡 Add Solution (+10 points)
+                        Add Solution
                     </button>
                 </div>
                 
                 <div id="toolsSection${painPointIndex}" class="tools-section">
-                    <h4>🛠️ Tools & Resources</h4>
-                    <p class="tools-hint">💡 Focus on using what you already have first!</p>
+                    <h4>Tools & Resources</h4>
+                    <p class="tools-hint">Focus on using what you already have first!</p>
                     
                     <div class="tools-input-group">
-                        <label>✅ Tools you can use right now:</label>
+                        <label>Tools you can use right now:</label>
                         <textarea id="existingTools${painPointIndex}" 
                                   placeholder="What do you already have that could help? (Microsoft Office, Google Workspace, Slack, Teams, email, existing databases, spreadsheets, your team's knowledge...)"
                                   class="tools-textarea"></textarea>
                     </div>
                     
                     <div class="tools-input-group">
-                        <label>⚠️ Additional tools (only if needed):</label>
+                        <label>Additional tools (only if needed):</label>
                         <textarea id="neededTools${painPointIndex}" 
                                   placeholder="Only list if absolutely necessary... (e.g., specific AI tools, training, subscriptions). Remember: start with what you have!"
                                   class="tools-textarea needed"></textarea>
                     </div>
                     
                     <button class="add-pain-btn save-tools-btn">
-                        💾 Save Your Resource Plan (+5 points)
+                        Save Your Resource Plan
                     </button>
                 </div>
             </div>
@@ -408,7 +389,7 @@ class WorkflowTemplates {
                 <span class="solution-type-icon" title="${solutionType === 'ai-suggested' ? 'AI-suggested solution' : 'Your custom solution'}">${typeIcon}</span>
                 <span class="solution-text">${solution}</span>
                 <button class="remove-btn" 
-                        data-action="remove-solution" data-pain-index="${painPointIndex}" data-solution-index="${solutionIndex}">❌</button>
+                        data-action="remove-solution" data-pain-index="${painPointIndex}" data-solution-index="${solutionIndex}">×</button>
             </div>
         `;
     }
@@ -419,10 +400,10 @@ class WorkflowTemplates {
     getRemainingPainPointItem(point, originalIndex, hasSolutions) {
         return `
             <div class="remaining-pain-item ${hasSolutions ? 'has-solutions' : ''}">
-                <span>${point.text} ${hasSolutions ? '✅' : ''}</span>
+                <span>${point.text} ${hasSolutions ? '(completed)' : ''}</span>
                 <button class="nav-btn switch-pain-btn" 
                         data-action="switch-pain" data-index="${originalIndex}">
-                    ${hasSolutions ? '🔄 Edit Solutions' : '💡 Add Solutions'}
+                    ${hasSolutions ? 'Edit Solutions' : 'Add Solutions'}
                 </button>
             </div>
         `;
@@ -434,27 +415,23 @@ class WorkflowTemplates {
     getResultsLevel(totalPoints, scoreMessage, workflowSummary, earnedBadges) {
         return `
             <div class="celebration">
-                <h2>🎉 Mission Complete!</h2>
+                <h2>Mission Complete!</h2>
                 <p>You've successfully mapped your AI enhancement journey!</p>
+                <div class="completion-trophy">
+                    <div class="final-trophy">🏆</div>
+                    <p>Congratulations on completing your workflow analysis!</p>
+                </div>
             </div>
 
-            <div class="final-badges">
-                ${earnedBadges.map(badge => `<div class="final-badge earned">${this.getBadgeIcon(badge)}</div>`).join('')}
-            </div>
-
-            <div class="score-section">
-                <h3>Final Score: <span class="final-score">${totalPoints}</span> Points!</h3>
-                <p class="score-message">${scoreMessage}</p>
-            </div>
-
+            
             <div class="results-section">
-                <h3>📋 Your AI-Augmented Workflow Plan</h3>
+                <h3>Your AI-Augmented Workflow Plan</h3>
                 <div id="workflowSummary">
                     ${this.buildWorkflowSummaryHTML(workflowSummary)}
                 </div>
                 
                 <div class="next-steps-box">
-                    <h4>🚀 Next Steps:</h4>
+                    <h4>Next Steps:</h4>
                     <ol>
                         <li>Pick your highest-severity pain point to tackle first</li>
                         <li>Try one AI solution for a week and measure the time saved</li>
@@ -465,12 +442,12 @@ class WorkflowTemplates {
                 
                 <div class="action-buttons">
                     <button class="download-btn">
-                        🖨️ Download Your Plan as PDF
+                        Download Your Plan as PDF
                     </button>
                     <p class="download-hint">
-                        💡 This opens a print-friendly window where you can save as PDF using your browser
+                        This opens a print-friendly window where you can save as PDF using your browser
                     </p>
-                    <button class="reset-btn">🔄 Start Over</button>
+                    <button class="reset-btn">Start Over</button>
                 </div>
             </div>
         `;
@@ -518,12 +495,12 @@ class WorkflowTemplates {
      */
     getBadgeIcon(badgeId) {
         const badgeMap = {
-            'badge-workflow': '🗺️',
-            'badge-pain': '🔍',
-            'badge-solution': '💡',
-            'badge-complete': '🏆'
+            'badge-workflow': 'W',
+            'badge-pain': 'P',
+            'badge-solution': 'S',
+            'badge-complete': 'M'
         };
-        return badgeMap[badgeId] || '🏅';
+        return badgeMap[badgeId] || 'B';
     }
 }
 

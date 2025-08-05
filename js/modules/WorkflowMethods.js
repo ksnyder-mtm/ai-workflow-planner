@@ -42,6 +42,9 @@ class WorkflowMethods {
             customSection.style.display = workflow === 'custom' ? 'block' : 'none';
         }
 
+        // Update inspiration examples based on selected workflow
+        this.updateInspirationExamples(app, workflow);
+
         // Award points
         const points = workflow === 'custom' ? 
             app.config.points.customWorkflow : 
@@ -268,9 +271,7 @@ class WorkflowMethods {
             app.earnBadge('badge-complete');
         }
 
-        // Calculate bonus points
-        const completionBonus = 50;
-        app.updatePoints(completionBonus, 'Mission complete!');
+        // Points removed - focus on workflow process
 
         if (app.ui) {
             app.ui.renderResults();
@@ -434,6 +435,38 @@ class WorkflowMethods {
 
         printWindow.document.write(printContent);
         printWindow.document.close();
+    }
+
+    /**
+     * Update inspiration examples based on selected workflow
+     */
+    static updateInspirationExamples(app, workflow) {
+        const examplesContainer = document.getElementById('workflowExamples');
+        if (!examplesContainer) return;
+
+        // Get workflow data
+        const workflowInfo = app.workflowData[workflow];
+        if (!workflowInfo || workflow === 'custom') {
+            // For custom workflow, show generic examples
+            examplesContainer.innerHTML = `
+                <div class="example-item">• Tasks that you do over and over again</div>
+                <div class="example-item">• Work that requires lots of manual copying/pasting</div>
+                <div class="example-item">• Time spent on formatting instead of thinking</div>
+            `;
+            return;
+        }
+
+        // Update with workflow-specific examples
+        const examples = workflowInfo.examples || [];
+        examplesContainer.innerHTML = examples.slice(0, 3).map(example => 
+            `<div class="example-item">• ${example}</div>`
+        ).join('');
+
+        // Update the header to be more specific
+        const headerElement = examplesContainer.previousElementSibling;
+        if (headerElement && headerElement.tagName === 'H4') {
+            headerElement.textContent = `Common pain points in ${workflowInfo.title}:`;
+        }
     }
 }
 

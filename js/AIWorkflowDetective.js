@@ -38,11 +38,11 @@ class AIWorkflowDetective {
             earnedBadges: []
         };
 
-        // Workflow data
-        this.workflowData = {
+        // Use workflow data from config
+        this.workflowData = window.AppConfig ? window.AppConfig.workflows : {
             meetings: {
                 title: "Meeting Management",
-                icon: "📋",
+                icon: "M",
                 description: "Planning, running, and following up on meetings",
                 examples: [
                     "Taking notes while facilitating",
@@ -61,7 +61,7 @@ class AIWorkflowDetective {
             },
             communication: {
                 title: "Communication & Outreach",
-                icon: "📧",
+                icon: "C",
                 description: "Emails, newsletters, social media, donor communications",
                 examples: [
                     "Writing similar emails repeatedly",
@@ -80,7 +80,7 @@ class AIWorkflowDetective {
             },
             data: {
                 title: "Data Collection & Analysis",
-                icon: "📊",
+                icon: "D",
                 description: "Surveys, reports, program evaluation, grant reporting",
                 examples: [
                     "Manually organizing survey responses",
@@ -99,7 +99,7 @@ class AIWorkflowDetective {
             },
             admin: {
                 title: "Administrative Tasks",
-                icon: "📁",
+                icon: "A",
                 description: "Scheduling, file organization, volunteer coordination",
                 examples: [
                     "Coordinating volunteer schedules",
@@ -118,7 +118,7 @@ class AIWorkflowDetective {
             },
             fundraising: {
                 title: "Fundraising & Grants",
-                icon: "💝",
+                icon: "F",
                 description: "Grant writing, donor research, event planning",
                 examples: [
                     "Researching potential donors",
@@ -137,42 +137,42 @@ class AIWorkflowDetective {
             }
         };
 
-        // AI capabilities
-        this.aiCapabilities = [
+        // Use AI capabilities from config
+        this.aiCapabilities = window.AppConfig ? window.AppConfig.aiCapabilities : [
             {
                 id: 'summarize',
                 name: 'Summarizing',
-                icon: '📝',
+                icon: 'S',
                 description: 'Condense long documents, meeting notes, or emails'
             },
             {
                 id: 'draft',
                 name: 'Drafting',
-                icon: '✍️',
+                icon: 'D',
                 description: 'Create first drafts of emails, reports, or proposals'
             },
             {
                 id: 'analyze',
                 name: 'Analyzing',
-                icon: '📊',
+                icon: 'A',
                 description: 'Find patterns in data, feedback, or survey responses'
             },
             {
                 id: 'organize',
                 name: 'Organizing',
-                icon: '🗂️',
+                icon: 'O',
                 description: 'Categorize information, create structure from chaos'
             },
             {
                 id: 'translate',
                 name: 'Translating',
-                icon: '🌐',
+                icon: 'T',
                 description: 'Convert content between languages or simplify jargon'
             },
             {
                 id: 'brainstorm',
                 name: 'Brainstorming',
-                icon: '💡',
+                icon: 'B',
                 description: 'Generate ideas, solutions, or creative approaches'
             }
         ];
@@ -285,18 +285,10 @@ class AIWorkflowDetective {
 
     /**
      * Update points and show notification
+     * @deprecated Points system removed to focus on workflow process
      */
     updatePoints(points, reason) {
-        this.state.totalPoints += points;
-        
-        const pointsDisplay = document.getElementById('pointsDisplay');
-        if (pointsDisplay) {
-            pointsDisplay.textContent = this.state.totalPoints;
-        }
-        
-        if (points > 0) {
-            this.showNotification(`+${points} points: ${reason}`, 'achievement');
-        }
+        // Points removed - focus on workflow process
     }
 
     /**
@@ -312,7 +304,7 @@ class AIWorkflowDetective {
             }
             
             this.showNotification('🏅 New badge earned!', 'achievement');
-            this.updatePoints(this.config.points.badgeEarn, 'Badge earned!');
+            // Points removed - focus on workflow process
         }
     }
 
@@ -545,11 +537,11 @@ class AIWorkflowDetective {
         
         if (progressText) {
             const messages = [
-                "Ready to begin your detective journey!",
-                "🧭 Context identified - great start!",
-                "🔍 Pain points discovered - you're on the trail!",
-                "🎯 Solutions designed - almost there!",
-                "🎉 Mission complete - you did it!"
+                "🗺️ Ready to Begin Your AI Explorer Journey!",
+                "Context identified - great start!",
+                "Pain points discovered - you're on the trail!",
+                "Solutions designed - almost there!",
+                "Mission complete - you did it!"
             ];
             progressText.textContent = messages[this.state.currentLevel] || '';
         }

@@ -451,17 +451,14 @@ class WorkflowDetectiveUI {
         const level = document.getElementById('results');
         if (!level) return;
 
-        const { totalPoints, earnedBadges, selectedWorkflow, customWorkflow, painPoints, solutions } = this.app.state;
-        
-        // Calculate score message
-        const scoreMessage = this.getScoreMessage(totalPoints);
+        const { earnedBadges, selectedWorkflow, customWorkflow, painPoints, solutions } = this.app.state;
         
         // Build workflow summary
         const workflowSummary = this.buildWorkflowSummary();
         
         level.innerHTML = this.templates.getResultsLevel(
-            totalPoints,
-            scoreMessage,
+            0, // totalPoints removed
+            '', // scoreMessage removed
             workflowSummary,
             earnedBadges
         );
@@ -472,13 +469,10 @@ class WorkflowDetectiveUI {
 
     /**
      * Get score message based on points
+     * @deprecated Points system removed
      */
     getScoreMessage(points) {
-        if (points >= 200) return "🌟 AI Detective Master! You've uncovered game-changing opportunities!";
-        if (points >= 150) return "🎯 Expert Detective! Your workflow transformation plan is solid!";
-        if (points >= 100) return "💪 Great Detective Work! You've identified key improvements!";
-        if (points >= 50) return "👍 Good Start! You've begun your AI enhancement journey!";
-        return "✨ Journey Started! Every step counts towards improvement!";
+        return '';
     }
 
     /**
