@@ -1,6 +1,6 @@
-# AI Workflow Detective - COMPAS Edition
+# AI Workflow Explorer - COMPAS Edition
 
-An interactive gamified learning experience that helps nonprofit organizations identify AI augmentation opportunities using the COMPAS framework.
+An interactive learning experience that helps nonprofit organizations identify AI augmentation opportunities using the COMPAS framework.
 
 ![Project Logo](https://img.shields.io/badge/Meet%20the%20Moment-blue)
 ![Framework](https://img.shields.io/badge/Framework-COMPAS-orange)
@@ -8,26 +8,25 @@ An interactive gamified learning experience that helps nonprofit organizations i
 
 ## 🎯 Overview
 
-The AI Workflow Detective is an engaging, gamified web application designed specifically for nonprofit staff to explore how AI can enhance their workflows without replacing human expertise. The tool guides users through the COMPAS framework (Context, Objective, Method, Performance, Assessment, Super You) to identify pain points and design AI-human collaboration solutions.
+The AI Workflow Explorer is an engaging web application designed specifically for nonprofit staff to explore how AI can enhance their workflows without replacing human expertise. The tool guides users through the COMPAS framework (Context, Objective, Method, Performance, Assessment, Super You) to identify pain points and design AI-human collaboration solutions.
 
 ## 🌟 Features
 
-### Interactive Gamification
-- **Points System**: Earn points for each action (10-15 points per major action)
-- **Achievement Badges**: Unlock badges as you progress through the journey
-- **Detective Theme**: Engaging "detective work" metaphor for exploring workflows
-- **Progress Tracking**: Visual progress bar and COMPAS framework indicators
+### Interactive Experience
+- **Explorer Theme**: Engaging "exploration" metaphor for discovering workflow opportunities
+- **Visual Progress**: Clean progress tracking throughout the journey
+- **Professional Design**: MTM brand colors and minimalist interface
 
 ### COMPAS Framework Integration
 - **Context**: Choose and analyze specific workflows
-- **Objective**: Identify pain points and prioritize solutions
+- **Objective**: Identify opportunities and prioritize solutions
 - **Method Planning**: Design AI-human collaboration approaches
 - Visual framework progress indicators
 
 ### Key Functionality
 - **Workflow Selection**: Choose from common nonprofit workflows or create custom ones
 - **Focused Approach**: Select one pain point at a time for deep analysis
-- **AI Superpowers**: Drag-and-drop AI capabilities to build solutions
+- **AI Capabilities**: Drag-and-drop AI tools to build solutions
 - **Solution Builder**: Create comprehensive AI enhancement plans
 - **PDF Export**: Generate professional reports (optimized for production deployment)
 
@@ -41,8 +40,8 @@ The AI Workflow Detective is an engaging, gamified web application designed spec
 
 ### Learning Journey
 1. **Mission Brief**: Introduction to AI augmentation concepts
-2. **Workflow Investigation**: Select and analyze problematic workflows
-3. **Pain Point Detection**: Identify specific time wasters and inefficiencies
+2. **Workflow Selection**: Choose and analyze workflows for enhancement
+3. **Opportunity Discovery**: Identify specific time wasters and inefficiencies
 4. **Solution Design**: Use AI capabilities to address challenges
 5. **Plan Generation**: Create actionable next steps
 
@@ -58,29 +57,32 @@ The AI Workflow Detective is an engaging, gamified web application designed spec
 
 ## 🎨 Design System
 
-### Color Palette
+### MTM Brand Colors
 - Primary Blue: `#1c487b`
 - Orange Accent: `#f18f38`  
 - Light Blue: `#1ab1d2`
 - Cream Background: `#fef4e3`
+- Light Blue Gray: `#85abbd`
 
 ### Visual Elements
-- Rounded corners and subtle shadows
-- Emoji-enhanced section headers
-- Interactive hover states and animations
-- Progress indicators and celebration effects
+- Clean, professional design with rounded corners
+- Selective emoji use for clarity (AI 🤖 vs User ✍️ solutions)
+- Smooth hover states and subtle transitions
+- Trophy celebration on completion
 
 ## 🚀 Getting Started
 
 ### Installation
 1. Clone the repository
-2. Open `index.html` in a web browser
+2. Open `index.html` or `index-modular.html` in a web browser
 3. No build process or dependencies required
+
+> **Note**: Use `index-modular.html` for development (preferred) or `index.html` for the single-file version.
 
 ### Usage
 1. Navigate through the guided workflow selection
-2. Add and prioritize pain points
-3. Select one pain point to focus on
+2. Add and prioritize improvement opportunities
+3. Select one opportunity to focus on
 4. Use drag-and-drop AI capabilities or custom solutions
 5. Generate and download your AI enhancement plan
 
@@ -96,7 +98,7 @@ The tool includes pre-configured workflows for:
 
 ## 🤖 AI Capabilities
 
-Interactive AI "superpowers" include:
+Interactive AI tools include:
 - **Summarizing**: Condense documents and communications
 - **Drafting**: Create first drafts of content
 - **Analyzing**: Find patterns in data and feedback
@@ -107,7 +109,7 @@ Interactive AI "superpowers" include:
 ## 📊 Learning Outcomes
 
 Users will learn to:
-- Identify workflow inefficiencies systematically
+- Identify workflow opportunities systematically
 - Distinguish between human-best and AI-best tasks
 - Design human-AI collaboration approaches
 - Create actionable implementation plans
@@ -140,6 +142,9 @@ Users will learn to:
 
 This project is developed for Meet the Moment's educational initiatives. For contributions or suggestions, please contact the development team.
 
+### Development Guidelines
+See `CLAUDE.md` for detailed development guidance and architecture notes.
+
 ## 📄 License
 
 MIT License - feel free to adapt for educational and nonprofit use.
@@ -150,5 +155,5 @@ Meet the Moment helps nonprofits use evidence and data to increase their impact.
 
 ---
 
-**🎯 Ready to become an AI Detective?** 
+**🎯 Ready to become an AI Explorer?** 
 Open `index.html` and start your workflow enhancement journey today!
