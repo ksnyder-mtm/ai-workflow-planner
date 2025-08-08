@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dynamic Examples - AI Workflow Detective</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main application container -->
+    <div id="app"></div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/config.js"></script>
+    <script src="js/modules/Templates.js"></script>
+    <script src="js/modules/UI.js"></script>
+    <script src="js/modules/WorkflowMethods.js"></script>
+    <script src="js/modules/DragDropHandler.js"></script>
+    <script src="js/AIWorkflowDetective.js"></script>
+    
+    <!-- Application initialization -->
+    <script>
+        let app;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create and initialize the application
+            app = new AIWorkflowDetective();
+            app.init();
+            
+            // Jump directly to workflow selection level for testing
+            setTimeout(() => {
+                app.startDetectiveWork();
+                console.log('Test: Dynamic examples feature activated');
+                console.log('Click on different workflow cards to see the examples change');
+            }, 500);
+            
+            window.app = app;
+        });
+
+        function showHelp(topic) {
+            const helpContent = {
+                overview: "This tool helps you identify workflows that could benefit from AI enhancement.",
+                workflow: "Choose the type of work that takes up too much of your time.",
+                pain: "Think about specific tasks that are repetitive, time-consuming, or error-prone.",
+                solution: "Match AI capabilities to your pain points."
+            };
+            
+            if (app) {
+                app.showNotification(helpContent[topic] || "Help is available for each section!", 'success');
+            }
+        }
+    </script>
+</body>
+</html>
