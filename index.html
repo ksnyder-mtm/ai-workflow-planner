@@ -84,7 +84,7 @@
         
         .header-border-top {
             height: 4px;
-            background: linear-gradient(90deg, var(--mtm-primary) 0%, var(--mtm-accent) 50%, var(--mtm-navy) 100%);
+            background: var(--mtm-primary);
         }
         
         .header {
@@ -121,11 +121,11 @@
         
         .header-border-bottom {
             height: 2px;
-            background: linear-gradient(90deg, var(--mtm-navy) 0%, var(--mtm-accent) 50%, var(--mtm-primary) 100%);
+            background: var(--mtm-primary);
         }
 
         .compas-info {
-            background: linear-gradient(135deg, var(--mtm-white) 0%, white 100%);
+            background: var(--mtm-white);
             padding: 24px 48px;
             border-bottom: 1px solid var(--mtm-border);
         }
@@ -180,12 +180,15 @@
         
         .method-highlight {
             display: inline-block;
-            background: linear-gradient(135deg, var(--mtm-primary), var(--mtm-accent));
+            background: var(--mtm-accent);
             color: white;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 4px;
-            font-weight: 600;
+            font-weight: 700;
             margin: 0 4px;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
         }
 
         .main-content {
@@ -703,7 +706,7 @@
                     <p class="compas-description">
                         <strong>COMPAS</strong> is a human-centered framework for AI implementation that guides you through six key phases:
                         Context, Objective, <span class="method-highlight">Method</span>, Performance, Assessment, and Super You.
-                        This planner focuses on the <strong>Method phase</strong> — creating concrete steps for HOW you'll implement AI solutions.
+                        This planner focuses on the Method phase — creating concrete steps for HOW you'll implement AI solutions.
                     </p>
                     <a href="https://www.linkedin.com/pulse/stop-fixing-flamethrowers-human-guide-navigating-shewe" target="_blank" class="compas-link">
                         Learn more about the COMPAS framework
