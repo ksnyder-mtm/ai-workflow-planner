@@ -74,14 +74,25 @@
         }
 
         /* Header with MTM branding */
-        .header {
+        .header-wrapper {
             background: white;
-            padding: 24px 48px;
-            border-radius: 8px 8px 0 0;
-            box-shadow: var(--mtm-shadow);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .header-border-top {
+            height: 4px;
+            background: linear-gradient(90deg, var(--mtm-primary) 0%, var(--mtm-accent) 50%, var(--mtm-navy) 100%);
+        }
+        
+        .header {
+            padding: 32px 48px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
         }
 
         .header-content {
@@ -89,57 +100,92 @@
         }
 
         .header h1 {
-            font-size: 40px;
+            font-size: 42px;
             color: var(--mtm-navy);
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         .header p {
-            font-size: 16px;
+            font-size: 18px;
             color: var(--mtm-text-secondary);
+            font-weight: 400;
         }
 
         .header-logo {
-            height: 60px;
+            height: 65px;
             margin-left: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .header-border-bottom {
+            height: 2px;
+            background: linear-gradient(90deg, var(--mtm-navy) 0%, var(--mtm-accent) 50%, var(--mtm-primary) 100%);
         }
 
-        .compas-indicator {
-            background: white;
-            padding: 20px;
-            border-radius: 0 0 8px 8px;
-            box-shadow: var(--mtm-shadow);
-            margin-bottom: 30px;
+        .compas-info {
+            background: linear-gradient(135deg, var(--mtm-white) 0%, white 100%);
+            padding: 24px 48px;
+            border-bottom: 1px solid var(--mtm-border);
         }
-
-        .compas-phases {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
+        
+        .compas-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
         }
-
-        .phase {
-            padding: 8px 16px;
-            border-radius: 20px;
-            background: var(--mtm-soft-blue);
-            color: white;
-            font-size: 14px;
-            opacity: 0.6;
-            transition: all 0.3s ease;
+        
+        .compas-description {
+            color: var(--mtm-text);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 12px;
         }
-
-        .phase.completed {
-            background: var(--mtm-success);
-            opacity: 1;
-        }
-
-        .phase.active {
-            background: var(--mtm-primary);
-            opacity: 1;
+        
+        .compas-description strong {
+            color: var(--mtm-navy);
             font-weight: 600;
-            transform: scale(1.05);
+        }
+        
+        .compas-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--mtm-primary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: rgba(26, 177, 210, 0.05);
+        }
+        
+        .compas-link:hover {
+            background: rgba(26, 177, 210, 0.1);
+            transform: translateX(2px);
+        }
+        
+        .compas-link svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            transition: transform 0.2s ease;
+        }
+        
+        .compas-link:hover svg {
+            transform: translateX(3px);
+        }
+        
+        .method-highlight {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--mtm-primary), var(--mtm-accent));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 0 4px;
         }
 
         .main-content {
@@ -614,6 +660,14 @@
                 margin: 20px 0 0 0;
             }
             
+            .compas-info {
+                padding: 20px 24px;
+            }
+            
+            .compas-description {
+                font-size: 14px;
+            }
+            
             .header h1 {
                 font-size: 32px;
             }
@@ -635,23 +689,31 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="header-content">
-                <h1>COMPAS Method Planner</h1>
-                <p>Building Your Implementation Plan</p>
+        <div class="header-wrapper">
+            <div class="header-border-top"></div>
+            <div class="header">
+                <div class="header-content">
+                    <h1>COMPAS Method Planner</h1>
+                    <p>Building Your Implementation Plan</p>
+                </div>
+                <img src="mtm-logo-trans.png" alt="Meet the Moment" class="header-logo">
             </div>
-            <img src="mtm-logo-trans.png" alt="Meet the Moment" class="header-logo">
-        </div>
-
-        <div class="compas-indicator">
-            <div class="compas-phases">
-                <div class="phase completed">Context</div>
-                <div class="phase completed">Objective</div>
-                <div class="phase active">Method</div>
-                <div class="phase">Performance</div>
-                <div class="phase">Assessment</div>
-                <div class="phase">Super You</div>
+            <div class="compas-info">
+                <div class="compas-content">
+                    <p class="compas-description">
+                        <strong>COMPAS</strong> is a human-centered framework for AI implementation that guides you through six key phases:
+                        Context, Objective, <span class="method-highlight">Method</span>, Performance, Assessment, and Super You.
+                        This planner focuses on the <strong>Method phase</strong> — creating concrete steps for HOW you'll implement AI solutions.
+                    </p>
+                    <a href="https://www.linkedin.com/pulse/stop-fixing-flamethrowers-human-guide-navigating-shewe" target="_blank" class="compas-link">
+                        Learn more about the COMPAS framework
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
             </div>
+            <div class="header-border-bottom"></div>
         </div>
 
         <div class="main-content">
