@@ -1,6 +1,6 @@
-# AI Workflow Explorer - COMPAS Edition
+# COMPAS Method Planner
 
-An interactive learning experience that helps nonprofit organizations identify AI augmentation opportunities using the COMPAS framework.
+A professional planning tool for nonprofit organizations to create concrete AI implementation strategies using the COMPAS framework.
 
 ![Project Logo](https://img.shields.io/badge/Meet%20the%20Moment-blue)
 ![Framework](https://img.shields.io/badge/Framework-COMPAS-orange)
@@ -8,142 +8,131 @@ An interactive learning experience that helps nonprofit organizations identify A
 
 ## 🎯 Overview
 
-The AI Workflow Explorer is an engaging web application designed specifically for nonprofit staff to explore how AI can enhance their workflows without replacing human expertise. The tool guides users through the COMPAS framework (Context, Objective, Method, Performance, Assessment, Super You) to identify pain points and design AI-human collaboration solutions.
+The COMPAS Method Planner is a structured web application designed for Human-Centered AI course participants to develop actionable implementation plans. Building on the Context and Objectives phases of the COMPAS framework, this tool guides users through the Method phase - creating concrete steps for HOW they'll actually implement AI solutions in their organizations.
 
 ## 🌟 Features
 
-### Interactive Experience
-- **Explorer Theme**: Engaging "exploration" metaphor for discovering workflow opportunities
-- **Visual Progress**: Clean progress tracking throughout the journey
-- **Professional Design**: MTM brand colors and minimalist interface
+### Professional Planning Interface
+- **Structured Approach**: Step-by-step implementation planning
+- **Clean Design**: MTM brand colors with professional line-style icons
+- **Progress Tracking**: Clear visual indicators throughout the journey
 
-### COMPAS Framework Integration
-- **Context**: Choose and analyze specific workflows
-- **Objective**: Identify opportunities and prioritize solutions
-- **Method Planning**: Design AI-human collaboration approaches
-- Visual framework progress indicators
+### COMPAS Method Framework
+- **Implementation Approach**: Choose between pilot, department, or organization-wide rollouts
+- **Tools Assessment**: Evaluate existing tools and identify new AI capabilities
+- **Concrete Steps**: Create detailed implementation plans with timelines
+- **Risk Mitigation**: Open-ended risk assessment and mitigation strategies
+- **Success Metrics**: Define measurable outcomes with baselines and targets
 
 ### Key Functionality
-- **Workflow Selection**: Choose from common nonprofit workflows or create custom ones
-- **Focused Approach**: Select one pain point at a time for deep analysis
-- **AI Capabilities**: Drag-and-drop AI tools to build solutions
-- **Solution Builder**: Create comprehensive AI enhancement plans
-- **PDF Export**: Generate professional reports (optimized for production deployment)
+- **Flexible Planning**: Create 1-8 implementation steps as needed
+- **Tool Integration**: Map existing organizational tools to AI opportunities
+- **Responsible Parties**: Assign clear ownership for each step
+- **PDF Export**: Generate professional implementation plans for stakeholders
+- **Timeline Management**: Set realistic deadlines for each phase
 
-## 🎮 User Experience
+## 🎯 Target Audience
 
-### Target Audience
-- Nonprofit technology staff
-- Program managers and directors
-- Teams new to AI who may feel overwhelmed
-- Organizations looking to enhance (not replace) human work with AI
-
-### Learning Journey
-1. **Mission Brief**: Introduction to AI augmentation concepts
-2. **Workflow Selection**: Choose and analyze workflows for enhancement
-3. **Opportunity Discovery**: Identify specific time wasters and inefficiencies
-4. **Solution Design**: Use AI capabilities to address challenges
-5. **Plan Generation**: Create actionable next steps
+- Human-Centered AI course participants (Session 3M)
+- Nonprofit technology leaders and managers
+- Organizations ready to move from strategy to implementation
+- Teams seeking structured approaches to AI adoption
 
 ## 🛠 Technology Stack
 
 - **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+)
-- **Styling**: Custom CSS with nonprofit-friendly color scheme
+- **Styling**: MTM-branded CSS with professional icons
 - **Libraries**: 
   - jsPDF for PDF generation
-  - html2canvas for screenshot functionality
-- **Responsive Design**: Mobile-friendly interface
-- **No Backend Required**: Runs entirely client-side
+  - Inline SVG icons for visual elements
+- **Responsive Design**: Works on all devices
+- **No Backend Required**: Privacy-focused, client-side only
 
 ## 🎨 Design System
 
 ### MTM Brand Colors
 - Primary Blue: `#1c487b`
-- Orange Accent: `#f18f38`  
+- Orange Accent: `#f18f38` (used for icons)
 - Light Blue: `#1ab1d2`
+- Soft Blue: `#85abbd`
 - Cream Background: `#fef4e3`
-- Light Blue Gray: `#85abbd`
+- White Background: `#fafdfe`
 
 ### Visual Elements
-- Clean, professional design with rounded corners
-- Selective emoji use for clarity (AI 🤖 vs User ✍️ solutions)
-- Smooth hover states and subtle transitions
-- Trophy celebration on completion
+- Professional line-style icons in orange accent
+- Clean, rounded corners (8px for cards)
+- Subtle shadows for depth
+- Clear typography hierarchy
 
 ## 🚀 Getting Started
 
 ### Installation
 1. Clone the repository
-2. Open `index.html` or `index-modular.html` in a web browser
+2. Open `compas-method-planner-mtm.html` in a web browser
 3. No build process or dependencies required
 
-> **Note**: Use `index-modular.html` for development (preferred) or `index.html` for the single-file version.
-
 ### Usage
-1. Navigate through the guided workflow selection
-2. Add and prioritize improvement opportunities
-3. Select one opportunity to focus on
-4. Use drag-and-drop AI capabilities or custom solutions
-5. Generate and download your AI enhancement plan
+1. Select your implementation approach (pilot, department, or organization-wide)
+2. Review existing organizational tools
+3. Identify new AI tools to integrate
+4. Create concrete implementation steps with timelines
+5. Assess risks and define mitigation strategies
+6. Set success metrics with baselines and targets
+7. Export your complete Method Plan as PDF
 
-## 📋 Example Workflows
+## 📋 Implementation Approaches
 
-The tool includes pre-configured workflows for:
-- **Meeting Management**: Planning, running, and following up
-- **Communication & Outreach**: Emails, newsletters, social media
-- **Data Collection & Analysis**: Surveys, reports, evaluations
-- **Administrative Tasks**: Scheduling, organization, coordination
-- **Fundraising & Grants**: Writing, research, event planning
-- **Custom Workflows**: User-defined processes
+The planner supports three scales:
+- **Small Pilot Program**: Low risk, 3-6 month timeline
+- **Department Rollout**: Medium risk, 6-12 month timeline
+- **Organization-Wide**: High impact, 12+ month timeline
 
-## 🤖 AI Capabilities
+## 🤖 AI Tool Categories
 
-Interactive AI tools include:
-- **Summarizing**: Condense documents and communications
-- **Drafting**: Create first drafts of content
-- **Analyzing**: Find patterns in data and feedback
-- **Organizing**: Structure and categorize information
-- **Translating**: Convert between languages or simplify jargon
-- **Brainstorming**: Generate ideas and creative solutions
+Evaluate and integrate:
+- **Productivity Tools**: ChatGPT, Claude, Microsoft Copilot
+- **Creative Tools**: DALL-E, Midjourney
+- **Automation**: Zapier, Make.com
+- **Analytics**: Google Gemini, custom solutions
+- **Existing Systems**: CRM, project management, communication tools
 
-## 📊 Learning Outcomes
+## 📊 Success Metrics
 
-Users will learn to:
-- Identify workflow opportunities systematically
-- Distinguish between human-best and AI-best tasks
-- Design human-AI collaboration approaches
-- Create actionable implementation plans
-- Think strategically about AI augmentation vs. replacement
+Define measurable outcomes:
+- Time savings and efficiency gains
+- Output quality improvements
+- User satisfaction scores
+- Impact scale and reach
+- Cost reduction targets
 
-## 🔧 Development Notes
+## 🔧 Course Integration
 
-### PDF Generation
-- Uses jsPDF for document creation
-- Optimized for production environments
-- Includes fallback options for development testing
-- Generates professional-looking reports with branding
+### Prerequisites (Sessions 1-2)
+- Participants have identified Context (pain points)
+- Participants have defined Objectives (what to solve)
 
-### Responsive Design
-- Mobile-first approach
-- Adaptive layout for different screen sizes
-- Touch-friendly interactions
-- Accessible design patterns
+### This Tool (Session 3M - Method)
+- Create HOW they'll implement solutions
+- Focus on concrete, actionable steps
+- Built-in risk mitigation planning
+
+### Next Sessions
+- Performance: Measuring results
+- Assessment: Iterating and improving
+- Super You: Embracing enhanced capabilities
 
 ## 📈 Future Enhancements
 
-- [ ] Backend integration for progress saving
+- [ ] Backend integration for saving plans
 - [ ] Team collaboration features
-- [ ] Advanced analytics and reporting
+- [ ] Template library for common implementations
 - [ ] Integration with project management tools
-- [ ] Expanded AI capability library
+- [ ] Progress tracking dashboard
 - [ ] Multi-language support
 
 ## 🤝 Contributing
 
-This project is developed for Meet the Moment's educational initiatives. For contributions or suggestions, please contact the development team.
-
-### Development Guidelines
-See `CLAUDE.md` for detailed development guidance and architecture notes.
+This project is developed for Meet the Moment's Human-Centered AI educational initiatives. For contributions or suggestions, please contact the development team.
 
 ## 📄 License
 
@@ -151,9 +140,10 @@ MIT License - feel free to adapt for educational and nonprofit use.
 
 ## 🏢 About Meet the Moment
 
-Meet the Moment helps nonprofits use evidence and data to increase their impact. This tool is part of our AI literacy and capacity building initiatives.
+Meet the Moment helps nonprofits navigate technology transformation with clarity, care, and integrity. This tool is part of our Human-Centered AI capacity building curriculum.
 
 ---
 
-**🎯 Ready to become an AI Explorer?** 
-Open `index.html` and start your workflow enhancement journey today!
+**Made with ❤️ for Nonprofits by Meet the Moment**
+
+Ready to create your AI implementation plan? Open `compas-method-planner-mtm.html` and start planning today!
